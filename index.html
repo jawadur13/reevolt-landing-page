@@ -127,36 +127,77 @@
       margin: 0 auto 48px;
     }
 
-    /* ── DASHBOARD PLACEHOLDER ── */
+    /* ── DASHBOARD VIDEO ── */
     .dashboard-wrap {
       max-width: 900px;
       margin: 0 auto;
       padding: 0 24px 40px;
     }
 
-    .dashboard-placeholder {
+    .dashboard-video-wrap {
+      position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
-      background: var(--cream-dark);
-      border: 1.5px dashed #C8C0B0;
+      border-radius: 18px;
+      padding: 3px;
+      overflow: hidden;
+    }
+
+    .dashboard-video-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      padding: 3px;
+      background: conic-gradient(
+        from var(--angle, 0deg),
+        var(--blue),
+        #6366f1,
+        #8b5cf6,
+        #a855f7,
+        var(--blue)
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: rotateBorder 4s linear infinite;
+    }
+
+    @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    @keyframes rotateBorder {
+      to { --angle: 360deg; }
+    }
+
+    .dashboard-video-wrap::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 22px;
+      background: conic-gradient(
+        from var(--angle, 0deg),
+        rgba(26, 53, 255, 0.25),
+        rgba(99, 102, 241, 0.15),
+        rgba(139, 92, 246, 0.1),
+        rgba(168, 85, 247, 0.15),
+        rgba(26, 53, 255, 0.25)
+      );
+      filter: blur(16px);
+      animation: rotateBorder 4s linear infinite;
+      z-index: -1;
+      opacity: 0.7;
+    }
+
+    .dashboard-video-wrap video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      color: #A89F90;
-    }
-
-    .dashboard-placeholder svg {
-      opacity: 0.45;
-    }
-
-    .dashboard-placeholder p {
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
+      display: block;
     }
 
     /* ── SOCIAL PROOF ── */
@@ -176,19 +217,20 @@
     .logo-grid {
       max-width: 900px;
       margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      border-top: 1px solid #E8E8E8;
-      border-left: 1px solid #E8E8E8;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0;
     }
 
     .logo-cell {
-      border-right: 1px solid #E8E8E8;
-      border-bottom: 1px solid #E8E8E8;
+      border: 1px solid #E8E8E8;
       padding: 28px 16px;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex: 0 0 16.666%;
+      max-width: 16.666%;
     }
 
     .logo-cell span {
@@ -201,8 +243,9 @@
     }
 
     @media (max-width: 640px) {
-      .logo-grid {
-        grid-template-columns: repeat(3, 1fr);
+      .logo-cell {
+        flex: 0 0 33.333%;
+        max-width: 33.333%;
       }
     }
 
@@ -329,40 +372,70 @@
     .feature-img {
       width: 100%;
       aspect-ratio: 4 / 3;
-      background: #F7F7F7;
-      border: 1px solid #EBEBEB;
-      border-radius: 12px;
+      border-radius: 20px;
       margin-bottom: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
       position: relative;
+      padding: 3px;
     }
 
-    .feature-img-inner {
-      width: 85%;
-      height: 80%;
-      background: #EFEFEF;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .feature-img-inner svg {
-      opacity: 0.25;
-    }
-
-    /* Subtle dot grid pattern on placeholder */
     .feature-img::before {
       content: '';
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(circle, #D0D0D0 1px, transparent 1px);
-      background-size: 18px 18px;
-      border-radius: 12px;
-      opacity: 0.5;
+      border-radius: 20px;
+      padding: 3px;
+      background: conic-gradient(
+        from var(--angle, 0deg),
+        var(--blue),
+        #6366f1,
+        #8b5cf6,
+        #a855f7,
+        var(--blue)
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: rotateBorder 4s linear infinite;
+    }
+
+    .feature-img::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 26px;
+      background: conic-gradient(
+        from var(--angle, 0deg),
+        rgba(26, 53, 255, 0.25),
+        rgba(99, 102, 241, 0.15),
+        rgba(139, 92, 246, 0.1),
+        rgba(168, 85, 247, 0.15),
+        rgba(26, 53, 255, 0.25)
+      );
+      filter: blur(16px);
+      animation: rotateBorder 4s linear infinite;
+      z-index: -1;
+      opacity: 0.7;
+    }
+
+    .feature-img-inner {
+      width: 100%;
+      height: 100%;
+      background: #EDEDED;
+      border-radius: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .feature-img-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .feature-card-title {
@@ -473,18 +546,19 @@
     /* Right: two columns of logo cards, scrolling */
     .integrations-right {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      grid-template-columns: auto auto;
+      gap: 10px;
       height: 380px;
       overflow: hidden;
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
       mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+      justify-content: center;
     }
 
     .logo-col {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
     }
 
     .logo-col-up {
@@ -505,12 +579,21 @@
       100% { transform: translateY(0); }
     }
 
+    @keyframes scrollLeft {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @keyframes scrollRight {
+      0%   { transform: translateX(-50%); }
+      100% { transform: translateX(0); }
+    }
+
     .logo-card {
-      background: #fff;
-      border: 1px solid #E8E8E8;
+      background: #E8E8E4;
       border-radius: 14px;
-      width: 100%;
-      aspect-ratio: 1;
+      width: 72px;
+      height: 72px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -520,11 +603,17 @@
     .logo-card span {
       font-family: 'Familjen Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 12px;
+      font-size: 10px;
       color: #BDBDBD;
       letter-spacing: -0.2px;
       text-align: center;
       padding: 4px;
+    }
+
+    .logo-card img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
     }
 
     @media (max-width: 680px) {
@@ -533,7 +622,28 @@
         gap: 48px;
       }
       .integrations-right {
-        height: 280px;
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        gap: 14px;
+        -webkit-mask-image: none;
+        mask-image: none;
+      }
+      .logo-col {
+        flex-direction: row;
+        gap: 10px;
+        overflow: hidden;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .logo-col::-webkit-scrollbar {
+        display: none;
+      }
+      .logo-col-up {
+        animation: scrollLeft 18s linear infinite;
+      }
+      .logo-col-down {
+        animation: scrollRight 18s linear infinite;
       }
     }
 
@@ -861,6 +971,9 @@
       gap: 48px;
       flex-wrap: wrap;
       width: 100%;
+      max-width: 980px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .footer-brand {
@@ -972,6 +1085,8 @@
       margin-top: 24px;
       width: 100%;
       max-width: 980px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .footer-copy {
@@ -1082,13 +1197,12 @@
     <p class="hero-sub">Reevolt is a complete web builder and ecommerce platform designed from the ground up for Bangladeshi businesses. Launch your store in closed beta and establish your online presence today.</p>
   </section>
 
-  <!-- DASHBOARD PLACEHOLDER -->
+  <!-- DASHBOARD VIDEO -->
   <div class="dashboard-wrap">
-    <div class="dashboard-placeholder">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
-      </svg>
-      <p>Product Dashboard</p>
+    <div class="dashboard-video-wrap">
+      <video autoplay muted loop playsinline>
+        <source src="component/animations/dashboard.mp4" type="video/mp4">
+      </video>
     </div>
   </div>
 
@@ -1137,7 +1251,7 @@
       <div class="feature-card">
         <div class="feature-img">
           <div class="feature-img-inner">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            <img src="component/images/launch-in-min.png" alt="Launch in minutes" />
           </div>
         </div>
         <p class="feature-card-title">Launch in minutes</p>
@@ -1147,7 +1261,7 @@
       <div class="feature-card">
         <div class="feature-img">
           <div class="feature-img-inner">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <img src="component/images/paymentmethod.png" alt="bKash and Nagad built in" />
           </div>
         </div>
         <p class="feature-card-title">bKash and Nagad built in</p>
@@ -1157,7 +1271,7 @@
       <div class="feature-card">
         <div class="feature-img">
           <div class="feature-img-inner">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            <img src="component/images/whatsapp-alert.png" alt="WhatsApp order alerts" />
           </div>
         </div>
         <p class="feature-card-title">WhatsApp order alerts</p>
@@ -1167,7 +1281,7 @@
       <div class="feature-card">
         <div class="feature-img">
           <div class="feature-img-inner">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v4H3z"/><path d="M3 10h18v4H3z"/><path d="M3 17h18v4H3z"/></svg>
+            <img src="component/images/simple-order-dashboard.png" alt="Simple order dashboard" />
           </div>
         </div>
         <p class="feature-card-title">Simple order dashboard</p>
@@ -1177,7 +1291,7 @@
       <div class="feature-card">
         <div class="feature-img">
           <div class="feature-img-inner">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+            <img src="component/images/own-url.png" alt="Your own storefront URL" />
           </div>
         </div>
         <p class="feature-card-title">Your own storefront URL</p>
@@ -1187,7 +1301,7 @@
       <div class="feature-card">
         <div class="feature-img">
           <div class="feature-img-inner">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <img src="component/images/taka-based.png" alt="Taka-based pricing" />
           </div>
         </div>
         <p class="feature-card-title">Taka-based pricing</p>
@@ -1213,34 +1327,52 @@
       </div>
 
       <div class="integrations-right">
-        <!-- Left column scrolls UP — duplicated for infinite loop -->
+        <!-- Left column scrolls UP / LEFT — duplicated for infinite loop -->
         <div class="logo-col logo-col-up">
-          <div class="logo-card"><span>bKash</span></div>
-          <div class="logo-card"><span>Nagad</span></div>
-          <div class="logo-card"><span>Facebook</span></div>
-          <div class="logo-card"><span>WhatsApp</span></div>
-          <div class="logo-card"><span>Pathao</span></div>
+          <div class="logo-card"><img src="component/logos/facebook.png" alt="Facebook" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/instagram.png" alt="Instagram" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/whatsapp.png" alt="WhatsApp" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/gmail.png" alt="Gmail" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/inventory.png" alt="Inventory" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/sheet.png" alt="Sheet" style="width:48px;height:48px;object-fit:contain;" /></div>
           <!-- duplicate -->
-          <div class="logo-card"><span>bKash</span></div>
-          <div class="logo-card"><span>Nagad</span></div>
-          <div class="logo-card"><span>Facebook</span></div>
-          <div class="logo-card"><span>WhatsApp</span></div>
-          <div class="logo-card"><span>Pathao</span></div>
+          <div class="logo-card"><img src="component/logos/facebook.png" alt="Facebook" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/instagram.png" alt="Instagram" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/whatsapp.png" alt="WhatsApp" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/gmail.png" alt="Gmail" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/inventory.png" alt="Inventory" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/sheet.png" alt="Sheet" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <!-- triplicate for horizontal mobile scroll -->
+          <div class="logo-card"><img src="component/logos/facebook.png" alt="Facebook" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/instagram.png" alt="Instagram" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/whatsapp.png" alt="WhatsApp" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/gmail.png" alt="Gmail" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/inventory.png" alt="Inventory" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/sheet.png" alt="Sheet" style="width:48px;height:48px;object-fit:contain;" /></div>
         </div>
 
-        <!-- Right column scrolls DOWN — duplicated for infinite loop -->
+        <!-- Right column scrolls DOWN / RIGHT — duplicated for infinite loop -->
         <div class="logo-col logo-col-down">
-          <div class="logo-card"><span>Shohoz</span></div>
-          <div class="logo-card"><span>Steadfast</span></div>
-          <div class="logo-card"><span>Instagram</span></div>
-          <div class="logo-card"><span>SSL Commerz</span></div>
-          <div class="logo-card"><span>RedX</span></div>
+          <div class="logo-card"><img src="component/logos/bkash.png" alt="bKash" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/nagad.png" alt="Nagad" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/pathao.png" alt="Pathao" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/steadfast.png" alt="Steadfast" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/sslcommerz.png" alt="SSL Commerz" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/redx.png" alt="RedX" style="width:48px;height:48px;object-fit:contain;" /></div>
           <!-- duplicate -->
-          <div class="logo-card"><span>Shohoz</span></div>
-          <div class="logo-card"><span>Steadfast</span></div>
-          <div class="logo-card"><span>Instagram</span></div>
-          <div class="logo-card"><span>SSL Commerz</span></div>
-          <div class="logo-card"><span>RedX</span></div>
+          <div class="logo-card"><img src="component/logos/bkash.png" alt="bKash" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/nagad.png" alt="Nagad" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/pathao.png" alt="Pathao" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/steadfast.png" alt="Steadfast" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/sslcommerz.png" alt="SSL Commerz" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/redx.png" alt="RedX" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <!-- triplicate for horizontal mobile scroll -->
+          <div class="logo-card"><img src="component/logos/bkash.png" alt="bKash" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/nagad.png" alt="Nagad" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/pathao.png" alt="Pathao" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/steadfast.png" alt="Steadfast" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/sslcommerz.png" alt="SSL Commerz" style="width:48px;height:48px;object-fit:contain;" /></div>
+          <div class="logo-card"><img src="component/logos/redx.png" alt="RedX" style="width:48px;height:48px;object-fit:contain;" /></div>
         </div>
       </div>
 
@@ -1426,25 +1558,22 @@
 
           <!-- WhatsApp -->
           <a href="#" class="social-btn" aria-label="WhatsApp">
-            <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-          </a>
-
-          <!-- Email -->
-          <a href="/cdn-cgi/l/email-protection#5f373a3333301f2d3a3a2930332b713c3032" class="social-btn" aria-label="Email">
-            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </a>
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15">
+    <path d="M26.576 5.363c-2.69-2.69-6.406-4.354-10.511-4.354-8.209 0-14.865 6.655-14.865 14.865 0 2.732 0.737 5.291 2.022 7.491l-0.038-0.070-2.109 7.702 7.879-2.067c2.051 1.139 4.498 1.809 7.102 1.809h0.006c8.209-0.003 14.862-6.659 14.862-14.868 0-4.103-1.662-7.817-4.349-10.507l0 0zM16.062 28.228h-0.005c-2.319 0-4.489-0.64-6.342-1.753l0.056 0.031-0.451-0.267-4.675 1.227 1.247-4.559-0.294-0.467c-1.185-1.862-1.889-4.131-1.889-6.565 0-6.822 5.531-12.353 12.353-12.353s12.353 5.531 12.353 12.353c0 6.822-5.53 12.353-12.353 12.353h-0zM22.838 18.977c-0.371-0.186-2.197-1.083-2.537-1.208-0.341-0.124-0.589-0.185-0.837 0.187-0.246 0.371-0.958 1.207-1.175 1.455-0.216 0.249-0.434 0.279-0.805 0.094-1.15-0.466-2.138-1.087-2.997-1.852l0.010 0.009c-0.799-0.74-1.484-1.587-2.037-2.521l-0.028-0.052c-0.216-0.371-0.023-0.572 0.162-0.757 0.167-0.166 0.372-0.434 0.557-0.65 0.146-0.179 0.271-0.384 0.366-0.604l0.006-0.017c0.043-0.087 0.068-0.188 0.068-0.296 0-0.131-0.037-0.253-0.101-0.357l0.002 0.003c-0.094-0.186-0.836-2.014-1.145-2.758-0.302-0.724-0.609-0.625-0.836-0.637-0.216-0.010-0.464-0.012-0.712-0.012-0.395 0.010-0.746 0.188-0.988 0.463l-0.001 0.002c-0.802 0.761-1.3 1.834-1.3 3.023 0 0.026 0 0.053 0.001 0.079l-0-0.004c0.131 1.467 0.681 2.784 1.527 3.857l-0.012-0.015c1.604 2.379 3.742 4.282 6.251 5.564l0.094 0.043c0.548 0.248 1.25 0.513 1.968 0.74l0.149 0.041c0.442 0.14 0.951 0.221 1.479 0.221 0.303 0 0.601-0.027 0.889-0.078l-0.031 0.004c1.069-0.223 1.956-0.868 2.497-1.749l0.009-0.017c0.165-0.366 0.261-0.793 0.261-1.242 0-0.185-0.016-0.366-0.047-0.542l0.003 0.019c-0.092-0.155-0.34-0.247-0.712-0.434z" stroke="#888" stroke-width="0.5" fill="#888"/>
+  </svg>
+</a>
 
         </div>
-        <p class="footer-contact"><a href="/cdn-cgi/l/email-protection#452d2029292a05372020332a29316b262a28"><span class="__cf_email__" data-cfemail="bdd5d8d1d1d2fdcfd8d8cbd2d1c993ded2d0">[email&#160;protected]</span></a></p>
+        <p class="footer-contact"><a href="mailto:reevolt.co@gmail.com">reevolt.co@gmail.com</a></p>
       </div>
       </div>
 
       <div class="footer-legal">
+        <p class="footer-copy">&copy; 2026 <span>Reevolt.</span> All rights reserved.</p>
         <div class="footer-links">
           <a href="#">Privacy Policy</a>
           <a href="#">Terms of Service</a>
         </div>
-        <p class="footer-copy">&copy; 2025 <span>Reevolt.</span> All rights reserved.</p>
       </div>
 
     <!-- Giant watermark -->

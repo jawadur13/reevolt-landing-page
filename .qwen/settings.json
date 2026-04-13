@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(cdn.svgrepo.com)",
+      "WebFetch(cdn.simpleicons.org)"
+    ]
+  },
+  "$version": 3
+}
