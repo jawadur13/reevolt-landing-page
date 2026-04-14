@@ -1169,6 +1169,31 @@
       .map-canvas-wrap {
         max-width: 240px;
       }
+
+      .ping-dot .core {
+        width: 5px; height: 5px;
+        box-shadow: 0 0 4px rgba(26,53,255,0.9);
+      }
+      .ping-dot .ring {
+        width: 5px; height: 5px;
+        border-width: 1.5px;
+      }
+      @keyframes ping {
+        0%   { transform: translate(-50%,-50%) scale(1); opacity: 0.9; }
+        100% { transform: translate(-50%,-50%) scale(3.5); opacity: 0; }
+      }
+      .order-toast {
+        padding: 6px 9px;
+        border-radius: 7px;
+        gap: 7px;
+      }
+      .toast-icon {
+        width: 22px; height: 22px;
+        border-radius: 5px;
+      }
+      .toast-icon svg { width: 11px; height: 11px; }
+      .toast-text strong { font-size: 10px; }
+      .toast-text span { font-size: 9px; }
     }
 
     .map-section {
