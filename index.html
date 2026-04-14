@@ -108,8 +108,8 @@
     .hero-headline {
       font-family: 'Familjen Grotesk', sans-serif;
       font-weight: 700;
-      font-size: clamp(32px, 7vw, 58px);
-      line-height: 1.1;
+      font-size: clamp(28px, 5.5vw, 42px);
+      line-height: 1.2;
       letter-spacing: -1.5px;
       color: var(--ink);
       margin-bottom: 20px;
@@ -119,6 +119,17 @@
       color: var(--blue);
       position: relative;
       display: inline-block;
+    }
+
+    .hero-headline > .hero-line1 {
+      color: inherit;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .hero-headline > .hero-line2 {
+      color: inherit;
+      display: inline;
+      white-space: nowrap;
     }
 
     .hero-headline span .beta-badge {
@@ -1212,8 +1223,11 @@
   <!-- HERO -->
   <section class="hero">
     <span class="hero-eyebrow">Website Builder and e-commerce infrastructure of Bangladesh 🇧🇩</span>
-    <h1 class="hero-headline">Build Your <span>Online Store<span class="beta-badge">Currently in Beta</span></span> Without Any Coding</h1>
-    <p class="hero-sub">Reevolt is a complete web builder and ecommerce platform designed from the ground up for Bangladeshi businesses. Launch your store in closed beta and establish your online presence today.</p>
+<h1 class="hero-headline">
+  <span class="hero-line1">নিজের অনলাইন স্টোর তৈরি করুন<span class="beta-badge">Currently in Beta</span></span>
+  <br />
+  <span class="hero-line2">কোনো কোডিং ছাড়াই</span>
+</h1>    <p class="hero-sub">Reevolt is a complete web builder and ecommerce platform designed from the ground up for Bangladeshi businesses. Launch your store in closed beta and establish your online presence today.</p>
   </section>
 
   <!-- DASHBOARD VIDEO -->
