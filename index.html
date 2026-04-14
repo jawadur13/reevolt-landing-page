@@ -653,15 +653,25 @@
         overflow: hidden;
         -ms-overflow-style: none;
         scrollbar-width: none;
+        width: 100%;
+        flex-wrap: nowrap;
+        position: relative;
+      }
+      .logo-col-inner {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        width: max-content;
+        will-change: transform;
       }
       .logo-col::-webkit-scrollbar {
         display: none;
       }
       .logo-col-up {
-        animation: scrollLeft 18s linear infinite;
+        animation: scrollLeft 24s linear infinite;
       }
       .logo-col-down {
-        animation: scrollRight 18s linear infinite;
+        animation: scrollRight 24s linear infinite;
       }
     }
 
@@ -1345,52 +1355,42 @@
       </div>
 
       <div class="integrations-right">
-        <!-- Left column scrolls UP / LEFT — duplicated for infinite loop -->
-        <div class="logo-col logo-col-up">
-          <div class="logo-card"><img src="component/logos/facebook.png" alt="Facebook" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/instagram.png" alt="Instagram" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/whatsapp.png" alt="WhatsApp" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/gmail.png" alt="Gmail" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/inventory.png" alt="Inventory" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/sheet.png" alt="Sheet" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <!-- duplicate -->
-          <div class="logo-card"><img src="component/logos/facebook.png" alt="Facebook" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/instagram.png" alt="Instagram" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/whatsapp.png" alt="WhatsApp" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/gmail.png" alt="Gmail" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/inventory.png" alt="Inventory" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/sheet.png" alt="Sheet" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <!-- triplicate for horizontal mobile scroll -->
-          <div class="logo-card"><img src="component/logos/facebook.png" alt="Facebook" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/instagram.png" alt="Instagram" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/whatsapp.png" alt="WhatsApp" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/gmail.png" alt="Gmail" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/inventory.png" alt="Inventory" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/sheet.png" alt="Sheet" style="width:48px;height:48px;object-fit:contain;" /></div>
+        <!-- Left column scrolls LEFT — duplicated for infinite loop -->
+        <div class="logo-col">
+          <div class="logo-col-inner logo-col-up">
+            <div class="logo-card"><img src="component/logos/facebook.png" alt="Facebook" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/instagram.png" alt="Instagram" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/whatsapp.png" alt="WhatsApp" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/gmail.png" alt="Gmail" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/inventory.png" alt="Inventory" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/sheet.png" alt="Sheet" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <!-- duplicate set for seamless loop -->
+            <div class="logo-card"><img src="component/logos/facebook.png" alt="Facebook" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/instagram.png" alt="Instagram" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/whatsapp.png" alt="WhatsApp" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/gmail.png" alt="Gmail" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/inventory.png" alt="Inventory" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/sheet.png" alt="Sheet" style="width:48px;height:48px;object-fit:contain;" /></div>
+          </div>
         </div>
 
-        <!-- Right column scrolls DOWN / RIGHT — duplicated for infinite loop -->
-        <div class="logo-col logo-col-down">
-          <div class="logo-card"><img src="component/logos/bkash.png" alt="bKash" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/nagad.png" alt="Nagad" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/pathao.png" alt="Pathao" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/steadfast.png" alt="Steadfast" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/sslcommerz.png" alt="SSL Commerz" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/redx.png" alt="RedX" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <!-- duplicate -->
-          <div class="logo-card"><img src="component/logos/bkash.png" alt="bKash" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/nagad.png" alt="Nagad" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/pathao.png" alt="Pathao" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/steadfast.png" alt="Steadfast" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/sslcommerz.png" alt="SSL Commerz" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/redx.png" alt="RedX" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <!-- triplicate for horizontal mobile scroll -->
-          <div class="logo-card"><img src="component/logos/bkash.png" alt="bKash" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/nagad.png" alt="Nagad" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/pathao.png" alt="Pathao" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/steadfast.png" alt="Steadfast" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/sslcommerz.png" alt="SSL Commerz" style="width:48px;height:48px;object-fit:contain;" /></div>
-          <div class="logo-card"><img src="component/logos/redx.png" alt="RedX" style="width:48px;height:48px;object-fit:contain;" /></div>
+        <!-- Right column scrolls RIGHT — duplicated for infinite loop -->
+        <div class="logo-col">
+          <div class="logo-col-inner logo-col-down">
+            <div class="logo-card"><img src="component/logos/bkash.png" alt="bKash" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/nagad.png" alt="Nagad" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/pathao.png" alt="Pathao" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/steadfast.png" alt="Steadfast" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/sslcommerz.png" alt="SSL Commerz" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/redx.png" alt="RedX" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <!-- duplicate set for seamless loop -->
+            <div class="logo-card"><img src="component/logos/bkash.png" alt="bKash" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/nagad.png" alt="Nagad" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/pathao.png" alt="Pathao" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/steadfast.png" alt="Steadfast" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/sslcommerz.png" alt="SSL Commerz" style="width:48px;height:48px;object-fit:contain;" /></div>
+            <div class="logo-card"><img src="component/logos/redx.png" alt="RedX" style="width:48px;height:48px;object-fit:contain;" /></div>
+          </div>
         </div>
       </div>
 
