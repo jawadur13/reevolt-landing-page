@@ -1443,9 +1443,11 @@
   <!-- WAITLIST FORM SECTION -->
   <section class="waitlist-section" id="waitlist">
     <div class="waitlist-inner">
-      <p class="waitlist-eyebrow">Early Access</p>
-      <h2 class="waitlist-heading">Join the waitlist</h2>
-      <p class="waitlist-sub">We are onboarding our first 10 merchants personally. Tell us about your business and we will be in touch.</p>
+     <div id="waitlistHeaderContent">
+  <p class="waitlist-eyebrow">Early Access</p>
+  <h2 class="waitlist-heading">Join the waitlist</h2>
+  <p class="waitlist-sub">We are onboarding our first 10 merchants personally. Tell us about your business and we will be in touch.</p>
+</div>
 
 <form 
   class="waitlist-form" 
@@ -1579,18 +1581,33 @@ var submitted = false;
 // 2. This function will run automatically when Google Forms replies to the hidden iframe
 function handleFormSuccess() {
   if (submitted) {
-    // Hide the form
+    // 1. Hide the header text and the form
+    document.getElementById('waitlistHeaderContent').style.display = 'none';
     document.getElementById('waitlistForm').style.display = 'none';
     
-    // Show your existing success message div
+    // 2. Show the success message
     const successMsg = document.getElementById('formSuccess');
     successMsg.classList.add('visible');
     
-    // Optional: Scroll to the message so the user sees it
+    // 3. Save status so it stays hidden after refresh
+    localStorage.setItem('joinedWaitlist', 'true');
+    
+    // 4. Scroll to success message
     successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
+
+// Check on page load if they have already joined
+window.addEventListener('load', function() {
+  if (localStorage.getItem('joinedWaitlist') === 'true') {
+    if(document.getElementById('waitlistForm')) {
+       document.getElementById('waitlistForm').style.display = 'none';
+       document.getElementById('waitlistHeaderContent').style.display = 'none';
+       document.getElementById('formSuccess').classList.add('visible');
+    }
+  }
+});
   </script>
 
   <!-- FOOTER -->
