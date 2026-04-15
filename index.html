@@ -1565,17 +1565,19 @@
         },
         body: JSON.stringify(data)
       })
-      .then(response => {
-        if (response.ok) {
+      .then(response => response.text())
+      .then(text => {
+        const result = JSON.parse(text);
+        if (result.status === 'success') {
           form.style.display = 'none';
           document.getElementById('formSuccess').classList.add('visible');
         } else {
-          alert('There was an error submitting the form. Please try again.');
+          alert('Error: ' + (result.message || 'Unknown error'));
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        alert('There was an error submitting the form. Please try again.');
+        alert('Network error: ' + error.message);
       });
     }
 
