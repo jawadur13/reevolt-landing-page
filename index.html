@@ -1211,7 +1211,9 @@
       overflow: visible;
     }
 
-    /* Highlights the input if the pattern doesn't match */
+
+  </style>
+</head>    /* Highlights the input if the pattern doesn't match */
 .form-group input:focus:invalid {
   border-color: #ff4d4d;
   box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
@@ -1221,8 +1223,6 @@
 .form-group input:valid {
   border-color: #28a745;
 }
-  </style>
-</head>
 <body>
 
   <!-- NAVBAR -->
@@ -1446,64 +1446,52 @@
   target="hidden_iframe" 
   onsubmit="submitted=true;"
 >
-        <div class="form-row">
-          <div class="form-group">
-            <label for="f-name">Full Name</label>
-            <input type="text" id="f-name" name="entry.1831269531" placeholder="Your name" required />
-          </div>
-         <div class="form-group">
-  <label for="f-whatsapp">WhatsApp Number</label>
-  <input 
-    type="tel" 
-    id="f-whatsapp" 
-    name="entry.1352912162" 
-    placeholder="01XXXXXXXXX" 
-    pattern="01[3-9][0-9]{8}" 
-    title="Please enter a valid 11-digit Bangladeshi number starting with 01 (e.g., 01712345678)"
-    required 
-  />
-</div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="f-name">Full Name</label>
+      <input type="text" id="f-name" name="entry.1831269531" placeholder="Your name" required />
+    </div>
+    <div class="form-group">
+      <label for="f-whatsapp">WhatsApp Number</label>
+      <input type="tel" id="f-whatsapp" name="entry.1352912162" placeholder="01XXXXXXXXX" pattern="01[3-9][0-9]{8}" title="Please enter a valid 11-digit Bangladeshi number" required />
+    </div>
+  </div>
 
-        <div class="form-group">
-  <label for="f-email">Email Address</label>
-  <input 
-    type="email" 
-    id="f-email" 
-    name="entry.271373500" 
-    placeholder="you@example.com" 
-    required 
-  />
-</div>
+  <div class="form-group">
+    <label for="f-email">Email Address</label>
+    <input type="email" id="f-email" name="entry.271373500" placeholder="you@example.com" required />
+  </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="f-bizname">Business Name</label>
-            <input type="text" id="f-bizname" name="entry.1246212936" placeholder="Your shop name" required />
-          </div>
-          <div class="form-group">
-            <label for="f-biztype">Business Type</label>
-        <select id="f-biztype" name="entry.901603856" required>
-  <option value="" disabled selected>Select a type</option>
-  <option value="Fashion and Clothing">Fashion and Clothing</option>
-  <option value="Food and Groceries">Food and Groceries</option>
-  <option value="Electronics">Electronics</option>
-  <option value="Beauty and Cosmetics">Beauty and Cosmetics</option>
-  <option value="Handicraft and Handmade">Handicraft and Handmade</option>
-  <option value="Furniture and Home">Furniture and Home</option>
-  <option value="Other">Other</option>
-</select>
-          </div>
-        </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="f-bizname">Business Name</label>
+      <input type="text" id="f-bizname" name="entry.1246212936" placeholder="Your shop name" required />
+    </div>
+    <div class="form-group">
+      <label for="f-biztype">Business Type</label>
+      <select id="f-biztype" name="entry.901603856" required>
+        <option value="" disabled selected>Select a type</option>
+        <option value="Fashion and Clothing">Fashion and Clothing</option>
+        <option value="Food and Groceries">Food and Groceries</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Beauty and Cosmetics">Beauty and Cosmetics</option>
+        <option value="Handicraft and Handmade">Handicraft and Handmade</option>
+        <option value="Furniture and Home">Furniture and Home</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+  </div>
 
-        <div class="form-group">
-          <label for="f-reason">Why do you want to join Reevolt?</label>
-          <textarea id="f-reason" name="entry.1567474224" placeholder="Tell us a bit about how you sell today and what you are hoping to change..." required></textarea>
-        </div>
+  <div class="form-group">
+    <label for="f-reason">Why do you want to join Reevolt?</label>
+    <textarea id="f-reason" name="entry.1567474224" placeholder="Tell us a bit about how you sell today and what you are hoping to change..." required></textarea>
+  </div>
 
-        <button type="submit" class="btn-submit">Request Early Access</button>
-        <p class="form-note">We review every application personally. You will hear back within 48 hours.</p>
+  <button type="submit" class="btn-submit">Request Early Access</button>
+  <p class="form-note">We review every application personally. You will hear back within 48 hours.</p>
+</form>
 
-      </form>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(typeof submitted !== 'undefined' && submitted) { handleFormSuccess(); }"></iframe>
       <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) { handleFormSuccess(); }"></iframe>
 
       <div class="form-success" id="formSuccess">
