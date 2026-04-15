@@ -1448,11 +1448,11 @@
         <div class="form-row">
           <div class="form-group">
             <label for="f-bizname">Business Name</label>
-            <input type="text" id="f-bizname" name="business_name" placeholder="Your shop name" required />
+            <input type="text" id="f-bizname" name="businessName" placeholder="Your shop name" required />
           </div>
           <div class="form-group">
             <label for="f-biztype">Business Type</label>
-            <select id="f-biztype" name="business_type" required>
+            <select id="f-biztype" name="businessType" required>
               <option value="" disabled selected>Select a type</option>
               <option value="fashion">Fashion and Clothing</option>
               <option value="food">Food and Groceries</option>
@@ -1467,7 +1467,7 @@
 
         <div class="form-group">
           <label for="f-reason">Why do you want to join Reevolt?</label>
-          <textarea id="f-reason" name="reason" placeholder="Tell us a bit about how you sell today and what you are hoping to change..." required></textarea>
+          <textarea id="f-reason" name="note" placeholder="Tell us a bit about how you sell today and what you are hoping to change..." required></textarea>
         </div>
 
         <button type="submit" class="btn-submit">Request Early Access</button>
@@ -1479,7 +1479,7 @@
         <div class="form-success-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A35FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <h3>You are on the list.</h3>
+        <h3>You're on the waitlist</h3>
         <p>Thank you for applying. We will review your application and reach out on WhatsApp within 48 hours.</p>
       </div>
 
@@ -1547,8 +1547,36 @@
 
     function handleSubmit(e) {
       e.preventDefault();
-      document.getElementById('waitlistForm').style.display = 'none';
-      document.getElementById('formSuccess').classList.add('visible');
+      const form = document.getElementById('waitlistForm');
+      const formData = new FormData(form);
+      const data = {
+        name: formData.get('name'),
+        whatsapp: formData.get('whatsapp'),
+        email: formData.get('email'),
+        businessName: formData.get('businessName'),
+        businessType: formData.get('businessType'),
+        note: formData.get('note')
+      };
+
+      fetch('https://script.google.com/macros/s/AKfycbzFhMRDSm3dN-PQdiH99V48yn8qFrcqxh0MxZQ7cu9bngsf5_BPHM_OH7HLbB6Y8a0W/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (response.ok) {
+          form.style.display = 'none';
+          document.getElementById('formSuccess').classList.add('visible');
+        } else {
+          alert('There was an error submitting the form. Please try again.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error submitting the form. Please try again.');
+      });
     }
 
   </script>
