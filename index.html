@@ -1598,16 +1598,6 @@ function handleFormSuccess() {
 }
 
 
-// Check on page load if they have already joined
-window.addEventListener('load', function() {
-  if (localStorage.getItem('joinedWaitlist') === 'true') {
-    if(document.getElementById('waitlistForm')) {
-       document.getElementById('waitlistForm').style.display = 'none';
-       document.getElementById('waitlistHeaderContent').style.display = 'none';
-       document.getElementById('formSuccess').classList.add('visible');
-    }
-  }
-});
   </script>
 
   <!-- FOOTER -->
