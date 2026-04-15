@@ -1211,7 +1211,16 @@
       overflow: visible;
     }
 
+/* Highlights the input if the pattern doesn't match */
+.form-group input:focus:invalid {
+  border-color: #ff4d4d;
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
+}
 
+/* Optional: highlights the input when it becomes valid */
+.form-group input:valid {
+  border-color: #28a745;
+}
   </style>
 </head>    /* Highlights the input if the pattern doesn't match */
 .form-group input:focus:invalid {
