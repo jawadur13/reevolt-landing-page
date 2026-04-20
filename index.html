@@ -286,6 +286,45 @@
       }
     }
 
+    /* ── SHOWCASE UI NAVBAR ── */
+    .showcase-navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: #fff;
+      border-bottom: 1px solid #F0F0F0;
+      height: 44px;
+    }
+
+    .store-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: #0D0D0D;
+      letter-spacing: -0.2px;
+      transition: all 0.5s ease;
+    }
+
+    .nav-ui-icons {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      color: #999;
+    }
+
+    .nav-ui-icons svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2.5;
+    }
+
+    .squares-container {
+      padding: 8px;
+      background: #fff;
+      border-top: 1px solid #F0F0F0;
+    }
+
     /* ── MAP SECTION ── */
     .map-section {
       background: #050A1A;
@@ -1367,24 +1406,138 @@
       Waitlist</a>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <span class="hero-eyebrow">Website Builder and e-commerce infrastructure of Bangladesh 🇧🇩</span>
-    <h1 class="hero-headline">
-      <span class="hero-line1">নিজের অনলাইন স্টোর তৈরি করুন<span class="beta-badge">Currently in Beta</span></span>
-      <br />
-      <span class="hero-line2">কোনো কোডিং ছাড়াই</span>
-    </h1>
-    <p class="hero-sub">Reevolt is a complete web builder and ecommerce platform designed from the ground up for
-      Bangladeshi businesses. Launch your store in closed beta and establish your online presence today.</p>
-  </section>
+  <!-- HERO SECTION -->
+  <section class="max-w-7xl mx-auto px-6 lg:px-12 py-12 lg:py-24 overflow-visible">
+    <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
 
-  <!-- DASHBOARD IMAGE -->
-  <div class="dashboard-wrap">
-    <div class="dashboard-image-wrap">
-      <img src="component/images/dashboard.png" alt="Reevolt Dashboard" />
+      <!-- Left Column: Text Content -->
+      <div class="w-full lg:w-1/2 space-y-6">
+        <span class="inline-block text-[13px] font-medium text-[#6B6659] tracking-wide uppercase">
+          Website Builder and e-commerce infrastructure of Bangladesh 🇧🇩
+        </span>
+
+        <h1
+          class="font-['Familjen_Grotesk'] font-bold text-[clamp(32px,5vw,52px)] leading-[1.15] tracking-tight text-[#0D0D0D]">
+          <span class="relative">
+            নিজের অনলাইন স্টোর তৈরি করুন
+            <span
+              class="absolute -top-2 lg:-top-4 -right-2 lg:-right-4 translate-x-3/4 bg-[#E5F2FF] border border-[#B2DAFF] text-[#007AF2] text-[10px] lg:text-[11px] font-semibold px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
+              Currently in Beta
+            </span>
+          </span>
+          <br />
+          কোনো কোডিং ছাড়াই
+        </h1>
+
+        <p class="text-base lg:text-lg text-[#6B6659] leading-relaxed max-w-xl">
+          Reevolt is a complete web builder and ecommerce platform designed from the ground up for
+          Bangladeshi businesses. Launch your store in closed beta and establish your online presence today.
+        </p>
+      </div>
+
+      <!-- Right Column: Animated 5-Box Grid & Floating Card -->
+      <div class="w-full lg:w-1/2 relative mt-8 lg:mt-0">
+
+        <!-- Main Grid Container -->
+        <div id="hero-grid"
+          class="relative rounded-2xl overflow-hidden border border-gray-200 shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-opacity duration-700 opacity-100 bg-white flex flex-col">
+
+          <!-- 1. UI Navbar -->
+          <div class="showcase-navbar">
+            <div class="w-10"></div> <!-- Spacer for center alignment -->
+            <div id="store-name" class="store-title transition-all duration-500">Dhaka Crafts</div>
+            <div class="nav-ui-icons">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                <path d="M3 6h18" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- 2. Middle Section (Hero Rectangle) -->
+          <div class="w-full aspect-video overflow-hidden border-b border-gray-100 bg-gray-50">
+            <img id="grid-main" src="component/banner/set1_1.png" alt="Hero Main"
+              class="w-full h-full object-cover transition-all duration-700" />
+          </div>
+
+          <!-- 3. Bottom Section (Grouped Squares) -->
+          <div class="squares-container">
+            <div class="grid grid-cols-4 gap-2 w-full">
+              <div class="aspect-square rounded-lg border border-gray-100 overflow-hidden bg-gray-50">
+                <img id="grid-b1" src="component/banner/set1_2.png" alt="Feature 1"
+                  class="w-full h-full object-cover transition-all duration-500" />
+              </div>
+              <div class="aspect-square rounded-lg border border-gray-100 overflow-hidden bg-gray-50">
+                <img id="grid-b2" src="component/banner/set1_3.png" alt="Feature 2"
+                  class="w-full h-full object-cover transition-all duration-500" />
+              </div>
+              <div class="aspect-square rounded-lg border border-gray-100 overflow-hidden bg-gray-50">
+                <img id="grid-b3" src="component/banner/set1_4.png" alt="Feature 3"
+                  class="w-full h-full object-cover transition-all duration-500" />
+              </div>
+              <div class="aspect-square rounded-lg border border-gray-100 overflow-hidden bg-gray-50">
+                <img id="grid-b4" src="component/banner/set1_5.png" alt="Feature 4"
+                  class="w-full h-full object-cover transition-all duration-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Secondary Image (Product Card) - Square Top + Attached Footer -->
+        <div id="hero-floating-wrap"
+          class="absolute -bottom-6 -right-4 lg:-bottom-8 lg:-right-6 w-40 lg:w-48 rounded-xl overflow-hidden border-4 border-white shadow-[0_15px_35px_rgba(0,0,0,0.2)] z-10 transform hover:scale-105 transition-all duration-500 ease-in-out bg-white flex flex-col">
+
+          <!-- Dynamic Top Part: Fixed Square -->
+          <div class="w-full aspect-square overflow-hidden bg-gray-50 flex items-center justify-center">
+            <img id="grid-floating" src="component/banner/set1_6.png" alt="Hero Floating Dynamic"
+              class="w-full h-full object-cover transition-all duration-500 ease-in-out transform" />
+          </div>
+
+          <!-- Static Bottom Part (Interactive UI) -->
+          <div class="p-2.5 space-y-2 bg-white border-t border-gray-100">
+            <!-- Quantity Selector -->
+            <div class="flex justify-between items-center border border-gray-200 rounded-lg px-1 text-gray-800">
+              <button id="qty-minus"
+                class="w-8 h-8 flex items-center justify-center text-lg font-light hover:bg-gray-50 rounded transition-colors">—</button>
+              <span id="qty-value" class="text-sm font-medium select-none">1</span>
+              <button id="qty-plus"
+                class="w-8 h-8 flex items-center justify-center text-lg font-light hover:bg-gray-50 rounded transition-colors">+</button>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <button id="add-to-cart-btn"
+              class="w-full flex justify-center items-center bg-[#007AF2] border-0 rounded-lg py-2 transition-all duration-300 hover:opacity-90 active:scale-95 relative overflow-hidden">
+              <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-shopping-cart">
+                <circle cx="8" cy="21" r="1" />
+                <circle cx="19" cy="21" r="1" />
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Subtle backglow for depth -->
+        <div class="absolute -inset-4 bg-gradient-to-tr from-blue-100/30 to-purple-100/30 blur-3xl -z-10 opacity-60">
+        </div>
+      </div>
+
     </div>
-  </div>
+  </section>
 
   <!-- SOCIAL PROOF -->
   <section class="social-proof">
@@ -1705,6 +1858,54 @@
   </section>
 
   <script>
+    // Banner rotation logic
+    const bannerSets = [
+      { name: 'Dhaka Crafts', main: 'set1_1.png', b1: 'set1_2.png', b2: 'set1_3.png', b3: 'set1_4.png', b4: 'set1_5.png', floating: 'set1_6.png' },
+      { name: 'NoorShop', main: 'set2_1.png', b1: 'set2_2.png', b2: 'set2_3.png', b3: 'set2_4.png', b4: 'set2_5.png', floating: 'set2_6.png' },
+      { name: 'UrbanKart', main: 'set3_1.png', b1: 'set3_2.png', b2: 'set3_3.png', b3: 'set3_4.png', b4: 'set3_5.png', floating: 'set3_6.png' }
+    ];
+    let currentSetIdx = 0;
+    const bannerPath = 'component/banner/';
+
+    function rotateBanner() {
+      const nextSetIdx = (currentSetIdx + 1) % bannerSets.length;
+      const set = bannerSets[nextSetIdx];
+      const items = [
+        { id: 'store-name', text: set.name },
+        { id: 'grid-main', file: set.main },
+        { id: 'grid-b1', file: set.b1 },
+        { id: 'grid-b2', file: set.b2 },
+        { id: 'grid-b3', file: set.b3 },
+        { id: 'grid-b4', file: set.b4 },
+        { id: 'grid-floating', file: set.floating }
+      ];
+
+      items.forEach((item, index) => {
+        const el = document.getElementById(item.id);
+        if (!el) return;
+
+        const staggerDelay = index * 80;
+
+        setTimeout(() => {
+          el.classList.add('opacity-0', 'translate-x-4');
+
+          setTimeout(() => {
+            if (item.file) {
+              el.src = bannerPath + item.file;
+            } else if (item.text) {
+              el.textContent = item.text;
+            }
+
+            setTimeout(() => {
+              el.classList.remove('opacity-0', 'translate-x-4');
+            }, 50);
+          }, 350);
+        }, staggerDelay);
+      });
+      currentSetIdx = nextSetIdx;
+    }
+    setInterval(rotateBanner, 5000);
+
     const cities = [
       { name: 'Dhaka', px: 51.5, py: 47.9, orders: ['T-shirt x2', 'Phone case', 'Kurti'] },
       { name: 'Chittagong', px: 81.9, py: 72.6, orders: ['Silk saree', 'Sneakers', 'Jewellery'] },
