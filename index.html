@@ -10,6 +10,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
     rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     *,
@@ -355,7 +356,7 @@
       background: #050A1A;
       padding: 80px 24px 88px;
       text-align: center;
-      overflow: hidden;
+      overflow: visible;
       position: relative;
     }
 
@@ -965,12 +966,11 @@
     }
 
     .waitlist-sub {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--muted);
       text-align: center;
       line-height: 1.6;
       margin-bottom: 24px;
-      font-size: 14px;
     }
 
     .waitlist-form {
@@ -1404,9 +1404,7 @@
       }
     }
 
-    .map-section {
-      overflow: visible;
-    }
+
 
     /* Highlights the input if the pattern doesn't match */
     .form-group input:focus:invalid {
@@ -1420,6 +1418,7 @@
     }
 
   </style>
+</head>
 
 <body>
 
@@ -1868,8 +1867,6 @@
 
       <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"
         onload="if(typeof submitted !== 'undefined' && submitted) { handleFormSuccess(); }"></iframe>
-      <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"
-        onload="if(submitted) { handleFormSuccess(); }"></iframe>
 
       <div class="form-success" id="formSuccess">
         <div class="form-success-icon">
@@ -1886,6 +1883,9 @@
   </section>
 
   <script>
+    // Declare submitted before the inline form onsubmit attribute fires
+    var submitted = false;
+
     // Banner rotation logic
     const bannerSets = [
       { name: 'Dhaka Crafts', main: 'set1_1.png', b1: 'set1_2.png', b2: 'set1_3.png', b3: 'set1_4.png', b4: 'set1_5.png', floating: 'set1_6.png' },
@@ -2043,8 +2043,7 @@
 
     setTimeout(fire, 900);
 
-    // 1. Declare this at the top of your script area
-    var submitted = false;
+    // submitted is declared at the top of this script block
 
     // 2. This function will run automatically when Google Forms replies to the hidden iframe
     function handleFormSuccess() {
@@ -2125,8 +2124,10 @@
         </div>
       </div>
 
-      <!-- Giant watermark -->
-      <div class="footer-watermark" aria-hidden="true">Reevolt</div>
+    </div><!-- /.footer-top -->
+
+    <!-- Giant watermark -->
+    <div class="footer-watermark" aria-hidden="true">Reevolt</div>
 
   </footer>
 
