@@ -353,7 +353,7 @@
 
     /* ── MAP SECTION ── */
     .map-section {
-      background: #050A1A;
+      background: #000000;
       padding: 80px 24px 88px;
       text-align: center;
       overflow: visible;
@@ -444,19 +444,20 @@
 
     .order-toast {
       position: absolute;
-      background: #0D1828;
-      border: 1px solid #1E2E48;
+      background: #111111;
+      border: 1px solid #2A2A2A;
       border-radius: 10px;
-      padding: 9px 13px;
+      padding: 8px 14px;
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 10px;
       white-space: nowrap;
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 0.4s ease, transform 0.4s ease;
       pointer-events: none;
       z-index: 10;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .order-toast.visible {
@@ -465,37 +466,30 @@
     }
 
     .toast-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      background: rgba(0, 122, 242, 0.18);
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
+      color: #9E9E9E;
     }
 
     .toast-icon svg {
       width: 14px;
       height: 14px;
-      stroke: var(--blue);
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
     }
 
-    .toast-text strong {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 1px;
+    .toast-text {
+      font-size: 12px;
+      color: #EDEDED;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: -0.2px;
     }
 
-    .toast-text span {
-      font-size: 10px;
-      color: #6B7A99;
+    .toast-price {
+      font-size: 12px;
+      color: #EDEDED;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: -0.2px;
+      margin-left: 6px;
     }
 
 
@@ -1379,28 +1373,19 @@
       }
 
       .order-toast {
-        padding: 6px 9px;
-        border-radius: 7px;
-        gap: 7px;
-      }
-
-      .toast-icon {
-        width: 22px;
-        height: 22px;
-        border-radius: 5px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        gap: 8px;
       }
 
       .toast-icon svg {
-        width: 11px;
-        height: 11px;
+        width: 12px;
+        height: 12px;
       }
 
-      .toast-text strong {
+      .toast-text,
+      .toast-price {
         font-size: 10px;
-      }
-
-      .toast-text span {
-        font-size: 9px;
       }
     }
 
@@ -2060,7 +2045,7 @@
   const toasts = Array.from({ length: POOL }, () => {
     const t = document.createElement('div');
     t.className = 'order-toast';
-    t.innerHTML = '<div class="toast-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div><div class="toast-text"><strong></strong><span></span></div>';
+    t.innerHTML = '<div class="toast-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div><div class="toast-text"></div><div class="toast-price"></div>';
     wrap.appendChild(t);
     return t;
   });
@@ -2069,14 +2054,15 @@
 
   function fireToastForCity(c) {
     const t = toasts[ti++ % POOL];
-    const item = c.orders[Math.floor(Math.random() * c.orders.length)];
+    const price = Math.floor(Math.random() * 4000) + 500;
 
     const ox = c.px > 70 ? -122 : 16;
     const oy = c.py > 72 ? -58 : 16;
     t.style.left = 'calc(' + c.px + '% + ' + ox + 'px)';
     t.style.top = 'calc(' + c.py + '% + ' + oy + 'px)';
-    t.querySelector('strong').textContent = 'New order — ' + c.name;
-    t.querySelector('span').textContent = item;
+
+    t.querySelector('.toast-text').textContent = 'New order in ' + c.name;
+    t.querySelector('.toast-price').textContent = '৳' + price.toLocaleString('en-IN');
 
     t.classList.remove('visible');
     void t.offsetWidth;
