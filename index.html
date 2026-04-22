@@ -1960,7 +1960,10 @@
     });
     currentSetIdx = nextSetIdx;
   }
-  setInterval(rotateBanner, 5000);
+  setTimeout(() => {
+    rotateBanner();
+    setInterval(rotateBanner, 4000);
+  }, 400);
 
   // Product Card interaction logic
   let currentQty = 1;
