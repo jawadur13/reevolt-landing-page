@@ -73,7 +73,7 @@
     }
 
     .btn-waitlist {
-      background: var(--blue);
+      background: var(--ink);
       color: #fff;
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 600;
@@ -89,7 +89,7 @@
     }
 
     .btn-waitlist:hover {
-      background: var(--blue-dark);
+      background: #2a2a2a;
       transform: translateY(-1px);
     }
 
@@ -1427,13 +1427,9 @@
 </head>
 
 <!-- ANNOUNCEMENT BAR -->
-<div id="announcement-bar" class="bg-[#007AF2] text-white py-2.5 px-4 relative flex items-center justify-center">
+<div id="announcement-bar" class="bg-black text-white py-1 px-4 relative flex items-center justify-center">
   <div class="text-[12px] lg:text-[13px] font-medium tracking-wide">
-    Beta is open — only 10 spots available.
-    <a href="#waitlist"
-      onclick="event.preventDefault();document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})"
-      class="underline underline-offset-4 hover:opacity-80 transition-opacity ml-1.5 font-bold">Claim your spot
-      &rarr;</a>
+    Reevolt is currently on beta.
   </div>
   <button onclick="this.parentElement.remove()"
     class="absolute right-4 text-white/70 hover:text-white transition-colors">
