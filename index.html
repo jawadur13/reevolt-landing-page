@@ -1996,9 +1996,11 @@
       }
     };
     qtyPlus.onclick = () => {
-      currentQty++;
-      qtyValue.textContent = currentQty;
-      resetCartBtn();
+      if (currentQty < 10) {
+        currentQty++;
+        qtyValue.textContent = currentQty;
+        resetCartBtn();
+      }
     };
   }
 
