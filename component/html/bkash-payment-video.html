@@ -746,7 +746,6 @@
       }
 
       async function typeInto(input, text, delay) {
-        input.focus();
         input.dispatchEvent(new Event('focus'));
         for (let i = 0; i < text.length; i++) {
           await wait(delay);
@@ -794,7 +793,7 @@
 
         // Type transaction ID
         await typeInto(txidInput, 'ABCDEF1234', 80);
-        txidInput.blur();
+
 
         // --- Move to confirm button ---
         await wait(500);
