@@ -44,13 +44,14 @@
     body {
       font-family: var(--font-body);
       background: transparent;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+      display: grid;
+      place-items: center;
       margin: 0;
       padding: 0;
       overflow: hidden;
+      position: relative;
     }
 
     .card {
@@ -58,8 +59,13 @@
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       padding: 28px;
-      width: 100%;
-      max-width: 420px;
+      width: 420px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      transform-origin: center center;
+      margin: 0;
     }
 
     .card-header {
@@ -837,12 +843,16 @@
 
       function autoScale() {
         const card = document.querySelector('.card');
-        const cardWidth = 460; 
-        const cardHeight = 650;
-        const scaleX = window.innerWidth / cardWidth;
-        const scaleY = window.innerHeight / cardHeight;
-        const scale = Math.min(scaleX, scaleY, 1);
-        card.style.transform = `scale(${scale})`;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Scale to fit the container while maintaining aspect ratio
+        // Using 440 and 600 as the "safe" bounds for the card dimensions
+        const scaleX = viewportWidth / 440;
+        const scaleY = viewportHeight / 600;
+        const scale = Math.min(scaleX, scaleY) * 0.98; // 0.98 for a tiny safety gap
+        
+        card.style.transform = `translate(-50%, -50%) scale(${scale})`;
       }
       window.addEventListener('resize', autoScale);
       autoScale();
