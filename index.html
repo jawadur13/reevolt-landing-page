@@ -2346,20 +2346,20 @@
     U[n] = gl.getUniformLocation(prog, n);
   });
 
-  // Base Colors: sophisticated mix of deep violets, slate blues, soft lavenders, muted rose tones
+  // ── 12 blobs — one vivid representative from each palette zone ──────────────
   const BLOBS = [
-    { p: [0.08, 0.15],  c: [0.35, 0.20, 0.50] },  // deep violet
-    { p: [0.55, 0.10],  c: [0.42, 0.50, 0.60] },  // slate blue
-    { p: [0.90, 0.25],  c: [0.70, 0.65, 0.85] },  // soft lavender
-    { p: [0.78, 0.60],  c: [0.85, 0.65, 0.65] },  // muted rose
-    { p: [0.50, 0.38],  c: [0.25, 0.25, 0.45] },  // dark indigo
-    { p: [0.20, 0.55],  c: [0.35, 0.45, 0.55] },  // steel blue
-    { p: [0.05, 0.72],  c: [0.80, 0.70, 0.75] },  // pale mauve
-    { p: [0.35, 0.88],  c: [0.55, 0.40, 0.55] },  // dusty plum
-    { p: [0.65, 0.82],  c: [0.80, 0.85, 0.95] },  // icy lavender
-    { p: [0.90, 0.85],  c: [0.75, 0.50, 0.55] },  // vintage rose
-    { p: [0.45, 0.65],  c: [0.20, 0.15, 0.35] },  // night violet
-    { p: [0.22, 0.30],  c: [0.55, 0.60, 0.70] },  // soft slate
+    { p: [0.08, 0.15],  c: [1.00, 0.30, 0.52] },  // hot pink
+    { p: [0.55, 0.10],  c: [0.55, 0.15, 0.98] },  // electric violet
+    { p: [0.90, 0.25],  c: [0.20, 0.78, 1.00] },  // cyan sky
+    { p: [0.78, 0.60],  c: [0.05, 0.20, 0.90] },  // vivid navy blue
+    { p: [0.50, 0.38],  c: [0.25, 0.95, 0.45] },  // neon green
+    { p: [0.20, 0.55],  c: [0.00, 0.85, 0.75] },  // vivid teal
+    { p: [0.05, 0.72],  c: [1.00, 0.48, 0.05] },  // vivid orange
+    { p: [0.35, 0.88],  c: [0.95, 0.08, 0.18] },  // vivid crimson
+    { p: [0.65, 0.82],  c: [0.70, 0.05, 1.00] },  // vivid purple
+    { p: [0.90, 0.85],  c: [1.00, 0.20, 0.80] },  // hot magenta
+    { p: [0.45, 0.65],  c: [1.00, 0.85, 0.30] },  // vivid yellow
+    { p: [0.22, 0.30],  c: [0.10, 0.10, 0.65] },  // deep indigo
   ];
 
   const DRIFT = BLOBS.map((b, i) => ({
