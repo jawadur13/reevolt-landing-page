@@ -537,75 +537,7 @@
       margin: 0 auto 64px;
     }
 
-    .features-grid {
-      max-width: 980px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
-    }
 
-    .feature-card {
-      text-align: left;
-    }
-
-    .feature-img {
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      border-radius: 20px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .feature-img-inner {
-      width: 100%;
-      height: 100%;
-      background: #EDEDED;
-      border-radius: 17px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .feature-img-inner img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .feature-card-title {
-      font-family: 'Familjen Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 17px;
-      color: var(--ink);
-      margin-bottom: 8px;
-      letter-spacing: -0.3px;
-    }
-
-    .feature-card-desc {
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--muted);
-    }
-
-    @media (max-width: 720px) {
-      .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-      }
-    }
-
-    @media (max-width: 460px) {
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-    }
 
 
     /* ── INTEGRATIONS SECTION ── */
@@ -1680,72 +1612,45 @@
   <p class="features-sub">Built from the ground up for how Bangladeshi businesses actually sell — not a foreign
     product retrofitted for this market.</p>
 
-  <div class="features-grid">
-
-    <div class="feature-card">
-      <div class="feature-img">
-        <div class="feature-img-inner">
-          <img src="component/images/launch-in-min.png" alt="Launch in minutes" />
+  <div class="max-w-[1040px] mx-auto flex flex-col gap-24 md:gap-32 mt-16 md:mt-24 pb-8">
+    
+    <!-- Row 1 -->
+    <div class="flex flex-col md:flex-row items-center gap-10 md:gap-20">
+      <div class="flex-1 text-left">
+        <h3 class="font-['Familjen_Grotesk'] font-bold text-3xl md:text-[40px] text-[#0D0D0D] mb-5 tracking-tight leading-[1.1]">Easy website builder</h3>
+        <p class="text-base md:text-[17px] text-[#6B6659] leading-[1.65]">Set up your store, add products, and go live without writing a single line of code or calling a developer.</p>
+      </div>
+      <div class="flex-1 w-full">
+        <div class="rounded-2xl overflow-hidden bg-[#EDEDED] shadow-[0_20px_50px_rgba(0,0,0,0.1)] aspect-[4/3] flex items-center justify-center border border-gray-100 transition-transform duration-500 hover:scale-[1.02]">
+          <img src="component/images/simple-order-dashboard.png" alt="Easy website builder" class="w-full h-full object-cover" />
         </div>
       </div>
-      <p class="feature-card-title">Launch in minutes</p>
-      <p class="feature-card-desc">Set up your store, add products, and go live without writing a single line of code
-        or calling a developer.</p>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-img">
-        <div class="feature-img-inner">
-          <iframe src="component/html/bkash-payment-video.html" style="width: 100%; height: 100%; border: none; pointer-events: none;" scrolling="no" title="bKash and Nagad built in"></iframe>
+    <!-- Row 2 -->
+    <div class="flex flex-col md:flex-row-reverse items-center gap-10 md:gap-20">
+      <div class="flex-1 text-left">
+        <h3 class="font-['Familjen_Grotesk'] font-bold text-3xl md:text-[40px] text-[#0D0D0D] mb-5 tracking-tight leading-[1.1]">Payment methods</h3>
+        <p class="text-base md:text-[17px] text-[#6B6659] leading-[1.65]">Accept payments via bKash, Nagad, and Cash on Delivery — no third-party integrations, no setup fees.</p>
+      </div>
+      <div class="flex-1 w-full">
+        <div class="rounded-2xl overflow-hidden bg-[#EDEDED] shadow-[0_20px_50px_rgba(0,0,0,0.1)] aspect-[4/3] flex items-center justify-center relative border border-gray-100 transition-transform duration-500 hover:scale-[1.02]">
+          <iframe src="component/html/bkash-payment-video.html" style="width: 100%; height: 100%; border: none; pointer-events: none;" scrolling="no" title="bKash and Nagad built in" class="absolute inset-0"></iframe>
         </div>
       </div>
-      <p class="feature-card-title">bKash and Nagad built in</p>
-      <p class="feature-card-desc">Accept payments via bKash, Nagad, and Cash on Delivery — no third-party
-        integrations, no setup fees.</p>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-img">
-        <div class="feature-img-inner">
-          <img src="component/images/whatsapp-alert.png" alt="WhatsApp order alerts" />
+    <!-- Row 3 -->
+    <div class="flex flex-col md:flex-row items-center gap-10 md:gap-20">
+      <div class="flex-1 text-left">
+        <h3 class="font-['Familjen_Grotesk'] font-bold text-3xl md:text-[40px] text-[#0D0D0D] mb-5 tracking-tight leading-[1.1]">Message Alerts</h3>
+        <p class="text-base md:text-[17px] text-[#6B6659] leading-[1.65]">Every new order sends an instant WhatsApp notification — manage your business from the same app you already use.</p>
+      </div>
+      <div class="flex-1 w-full">
+        <div class="rounded-2xl overflow-hidden bg-[#EDEDED] shadow-[0_20px_50px_rgba(0,0,0,0.1)] aspect-[4/3] flex items-center justify-center border border-gray-100 transition-transform duration-500 hover:scale-[1.02]">
+          <img src="component/images/whatsapp-alert.png" alt="Message Alerts" class="w-full h-full object-cover" />
         </div>
       </div>
-      <p class="feature-card-title">WhatsApp order alerts</p>
-      <p class="feature-card-desc">Every new order sends an instant WhatsApp notification — manage your business from
-        the same app you already use.</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-img">
-        <div class="feature-img-inner">
-          <img src="component/images/simple-order-dashboard.png" alt="Simple order dashboard" />
-        </div>
-      </div>
-      <p class="feature-card-title">Simple order dashboard</p>
-      <p class="feature-card-desc">See all your orders, track status, and manage customers from one clean dashboard —
-        no training required.</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-img">
-        <div class="feature-img-inner">
-          <img src="component/images/own-url.png" alt="Your own storefront URL" />
-        </div>
-      </div>
-      <p class="feature-card-title">Your own storefront URL</p>
-      <p class="feature-card-desc">Get a real website your customers can visit — not just a link in bio. Share it
-        anywhere, own your presence online.</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-img">
-        <div class="feature-img-inner">
-          <img src="component/images/taka-based.png" alt="Taka-based pricing" />
-        </div>
-      </div>
-      <p class="feature-card-title">Taka-based pricing</p>
-      <p class="feature-card-desc">Priced in BDT, paid in BDT. No dollar conversions, no foreign cards, no surprises
-        on your monthly bill.</p>
     </div>
 
   </div>
