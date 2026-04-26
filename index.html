@@ -2254,203 +2254,186 @@
 (function() {
   'use strict';
 
-  // ─── Color Palette ───
-  const nordicColors = [
-    [0.227, 0.353, 0.486],  // deep steel blue
-    [0.420, 0.561, 0.639],  // icy slate
-    [0.353, 0.561, 0.561],  // soft teal
-    [0.290, 0.416, 0.541],  // cold navy
-    [0.380, 0.490, 0.580],  // arctic grey-blue
-    [0.310, 0.520, 0.510],  // glacier teal
-  ];
-
-  // ─── State ───
-  let mouseX = 0.5, mouseY = 0.5;
-  let smoothMouseX = 0.5, smoothMouseY = 0.5;
-
-  // ─── Canvas & GL Setup ───
   const canvas = document.getElementById('meshCanvas');
   const container = document.getElementById('meshGradientContainer');
   if (!canvas || !container) return;
 
-  const gl = canvas.getContext('webgl', { antialias: false, alpha: false });
+  const gl = canvas.getContext('webgl', { antialias: false, alpha: false }) || canvas.getContext('experimental-webgl', { antialias: false, alpha: false });
   if (!gl) { console.warn('WebGL not supported'); return; }
 
-  // ─── Shaders ───
-  const vertSrc = `
-    attribute vec2 a_position;
-    varying vec2 v_uv;
-    void main() {
-      v_uv = a_position * 0.5 + 0.5;
-      gl_Position = vec4(a_position, 0.0, 1.0);
-    }
+  const VS = `
+  attribute vec2 a_pos;
+  void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
   `;
 
-  const fragSrc = `
-    precision mediump float;
-    varying vec2 v_uv;
-    uniform float u_time;
-    uniform vec2 u_resolution;
-    uniform vec3 u_colors[6];
-    uniform vec2 u_mouse;
+  const FS = `
+  precision highp float;
 
-    // Gaussian blob
-    float gaussian(vec2 uv, vec2 center, float sigma) {
-      vec2 d = uv - center;
-      return exp(-dot(d, d) / (2.0 * sigma * sigma));
+  uniform vec2  u_res;
+  uniform float u_time;
+  uniform vec2  u_bp[12];
+  uniform vec3  u_bc[12];
+  uniform vec2  u_mouse;
+  uniform float u_mpull;
+
+  float gauss(float d2, float sigma) {
+    return exp(-d2 / (2.0 * sigma * sigma));
+  }
+
+  vec3 vibrance(vec3 c, float strength) {
+    float mx = max(c.r, max(c.g, c.b));
+    float mn = min(c.r, min(c.g, c.b));
+    float sat = mx - mn;
+    return c + (c - vec3((mx + mn) * 0.5)) * strength * (1.0 - sat);
+  }
+
+  void main() {
+    vec2 uv = gl_FragCoord.xy / u_res;
+    uv.y = 1.0 - uv.y;
+    vec2 asp = vec2(u_res.x / u_res.y, 1.0);
+
+    // Warp UV toward mouse — squeezes blobs together, blending colors
+    vec2 toMouse = u_mouse - uv;
+    float mdist = length(toMouse * asp);
+    float warp = u_mpull * 0.38 * exp(-mdist * mdist / (2.0 * 0.28 * 0.28));
+    vec2 warpedUV = uv + toMouse * warp;
+
+    vec3 col = vec3(0.0);
+    float wsum = 0.0;
+
+    for (int i = 0; i < 12; i++) {
+      // Each blob is pulled toward mouse too — nearby ones converge
+      vec2 blobToMouse = u_mouse - u_bp[i];
+      float bdist = length(blobToMouse * asp);
+      float bpull = u_mpull * 0.5 * exp(-bdist * bdist / (2.0 * 0.35 * 0.35));
+      vec2 bp = u_bp[i] + blobToMouse * bpull;
+
+      vec2 d = (warpedUV - bp) * asp;
+      float w = gauss(dot(d,d), 0.36);
+      col   += u_bc[i] * w;
+      wsum  += w;
     }
 
-    // Hash for film grain
-    float hash(vec2 p) {
-      vec3 p3 = fract(vec3(p.xyx) * 0.1031);
-      p3 += dot(p3, p3.yzx + 33.33);
-      return fract((p3.x + p3.y) * p3.z);
-    }
+    col /= max(wsum, 0.0001);
 
-    void main() {
-      vec2 uv = v_uv;
-      float aspect = u_resolution.x / u_resolution.y;
-      vec2 uvA = vec2(uv.x * aspect, uv.y);
+    col = vibrance(col, 0.55);
 
-      vec3 color = vec3(0.0);
-      float totalWeight = 0.0;
+    float grain = fract(sin(dot(gl_FragCoord.xy, vec2(127.1, 311.7)) + u_time * 0.01) * 43758.5453) * 0.016 - 0.008;
+    col += grain;
 
-      // 6 drifting anchor blobs
-      for (int i = 0; i < 6; i++) {
-        float fi = float(i);
-        float speed = 0.15 + fi * 0.02; // Faster animation
-        float phase = fi * 1.047;
-
-        vec2 center = vec2(
-          0.15 + 0.7 * fract(fi * 0.17 + 0.3) + 0.12 * sin(u_time * speed + phase),
-          0.15 + 0.7 * fract(fi * 0.29 + 0.1) + 0.12 * cos(u_time * (speed + 0.02) + phase * 1.3)
-        );
-        center.x *= aspect;
-
-        float sigma = 0.32 + 0.08 * sin(u_time * 0.05 + fi);
-        float w = gaussian(uvA, center, sigma);
-        color += u_colors[i] * w;
-        totalWeight += w;
-      }
-
-      // Mouse highlight blob (Stronger & more prominent)
-      vec2 mouseCenter = vec2(u_mouse.x * aspect, u_mouse.y);
-      float mw = gaussian(uvA, mouseCenter, 0.25) * 0.8;
-      vec3 highlightColor = mix(u_colors[0], u_colors[2], 0.5) * 1.3;
-      color += highlightColor * mw;
-      totalWeight += mw;
-
-      // Normalize
-      color = color / max(totalWeight, 0.001);
-
-      // Subtle brightness boost in center
-      float vignette = 1.0 - 0.15 * length(uv - 0.5);
-      color *= vignette;
-
-      // Film grain dither to prevent banding
-      float grain = (hash(uv * u_resolution + u_time * 100.0) - 0.5) * 0.035;
-      color += grain;
-
-      // Gentle saturation boost
-      float lum = dot(color, vec3(0.299, 0.587, 0.114));
-      color = mix(vec3(lum), color, 1.15);
-
-      gl_FragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
-    }
+    gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+  }
   `;
 
-  function createShader(type, src) {
+  function compile(type, src) {
     const s = gl.createShader(type);
     gl.shaderSource(s, src);
     gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-      console.error('Shader error:', gl.getShaderInfoLog(s));
-      return null;
-    }
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+      console.error(gl.getShaderInfoLog(s));
     return s;
   }
 
-  const vs = createShader(gl.VERTEX_SHADER, vertSrc);
-  const fs = createShader(gl.FRAGMENT_SHADER, fragSrc);
-  const program = gl.createProgram();
-  gl.attachShader(program, vs);
-  gl.attachShader(program, fs);
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error('Program link error:', gl.getProgramInfoLog(program));
-    return;
-  }
-  gl.useProgram(program);
+  const prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
 
-  // Full-screen quad
   const buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-  const aPos = gl.getAttribLocation(program, 'a_position');
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, 'a_pos');
   gl.enableVertexAttribArray(aPos);
   gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
-  // Uniforms
-  const uTime = gl.getUniformLocation(program, 'u_time');
-  const uRes = gl.getUniformLocation(program, 'u_resolution');
-  const uMouse = gl.getUniformLocation(program, 'u_mouse');
-  const uColors = [];
-  for (let i = 0; i < 6; i++) {
-    uColors.push(gl.getUniformLocation(program, 'u_colors[' + i + ']'));
-  }
+  const U = {};
+  ['u_res','u_time','u_bp','u_bc','u_mouse','u_mpull'].forEach(n => {
+    U[n] = gl.getUniformLocation(prog, n);
+  });
 
-  // ─── Resize ───
+  // Base Colors: sophisticated mix of deep violets, slate blues, soft lavenders, muted rose tones
+  const BLOBS = [
+    { p: [0.08, 0.15],  c: [0.35, 0.20, 0.50] },  // deep violet
+    { p: [0.55, 0.10],  c: [0.42, 0.50, 0.60] },  // slate blue
+    { p: [0.90, 0.25],  c: [0.70, 0.65, 0.85] },  // soft lavender
+    { p: [0.78, 0.60],  c: [0.85, 0.65, 0.65] },  // muted rose
+    { p: [0.50, 0.38],  c: [0.25, 0.25, 0.45] },  // dark indigo
+    { p: [0.20, 0.55],  c: [0.35, 0.45, 0.55] },  // steel blue
+    { p: [0.05, 0.72],  c: [0.80, 0.70, 0.75] },  // pale mauve
+    { p: [0.35, 0.88],  c: [0.55, 0.40, 0.55] },  // dusty plum
+    { p: [0.65, 0.82],  c: [0.80, 0.85, 0.95] },  // icy lavender
+    { p: [0.90, 0.85],  c: [0.75, 0.50, 0.55] },  // vintage rose
+    { p: [0.45, 0.65],  c: [0.20, 0.15, 0.35] },  // night violet
+    { p: [0.22, 0.30],  c: [0.55, 0.60, 0.70] },  // soft slate
+  ];
+
+  const DRIFT = BLOBS.map((b, i) => ({
+    ox: b.p[0], oy: b.p[1],
+    ax: 0.22 + (i % 3) * 0.08,
+    ay: 0.18 + (i % 4) * 0.07,
+    px: (i * 1.37) % (Math.PI * 2),
+    py: (i * 2.11) % (Math.PI * 2),
+    sp: 0.18 + (i % 5) * 0.04,
+  }));
+
+  const colors = BLOBS.map(b => [...b.c]);
+
+  let mouseX = 0.5, mouseY = 0.5;
+  let smx = 0.5, smy = 0.5;
+  let pull = 0, tpull = 0;
+
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const rect = container.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
     gl.viewport(0, 0, canvas.width, canvas.height);
   }
-  resize();
   window.addEventListener('resize', resize);
+  resize();
 
-  // ─── Mouse tracking ───
   const wrapper = document.querySelector('.hero-gradient-wrapper');
   if (wrapper) {
-    wrapper.addEventListener('mousemove', function(e) {
+    wrapper.addEventListener('mousemove', e => {
       const rect = container.getBoundingClientRect();
       mouseX = (e.clientX - rect.left) / rect.width;
-      mouseY = 1.0 - (e.clientY - rect.top) / rect.height;
+      mouseY = (e.clientY - rect.top) / rect.height;
+      tpull = 1;
     });
-    wrapper.addEventListener('mouseleave', function() {
-      // Gentle return to center when mouse leaves
-      mouseX = 0.5;
-      mouseY = 0.5;
+    wrapper.addEventListener('mouseleave', () => {
+      tpull = 0;
     });
   }
 
-  // ─── Animation Loop ───
-  let startTime = performance.now();
+  const t0 = performance.now();
+  function lerp(a, b, k) { return a + (b - a) * k; }
 
-  function frame(now) {
-    const t = (now - startTime) * 0.001;
+  function render(now) {
+    const t = (now - t0) * 0.001;
 
-    // Smooth mouse follow (increased from 0.04 to 0.1 for more responsiveness)
-    smoothMouseX += (mouseX - smoothMouseX) * 0.1;
-    smoothMouseY += (mouseY - smoothMouseY) * 0.1;
+    smx = lerp(smx, mouseX, 0.05);
+    smy = lerp(smy, mouseY, 0.05);
+    pull = lerp(pull, tpull, 0.04);
 
-    // Set uniforms
-    gl.uniform1f(uTime, t);
-    gl.uniform2f(uRes, canvas.width, canvas.height);
-    gl.uniform2f(uMouse, smoothMouseX, smoothMouseY);
-    for (let i = 0; i < 6; i++) {
-      gl.uniform3f(uColors[i], nordicColors[i][0], nordicColors[i][1], nordicColors[i][2]);
-    }
+    const positions = DRIFT.map(d => [
+      d.ox + Math.sin(t * d.sp + d.px) * d.ax,
+      d.oy + Math.cos(t * d.sp * 0.85 + d.py) * d.ay,
+    ]);
+
+    gl.uniform2f(U.u_res, canvas.width, canvas.height);
+    gl.uniform1f(U.u_time, t);
+    gl.uniform2fv(U.u_bp, positions.flat());
+    gl.uniform3fv(U.u_bc, colors.flat());
+    gl.uniform2f(U.u_mouse, smx, smy);
+    gl.uniform1f(U.u_mpull, pull);
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    requestAnimationFrame(frame);
+    requestAnimationFrame(render);
   }
-  requestAnimationFrame(frame);
+  requestAnimationFrame(render);
 
 })();
 </script>
