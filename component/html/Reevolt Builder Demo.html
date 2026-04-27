@@ -381,7 +381,7 @@
             el.clientWidth / width,
             el.clientHeight / height
           );
-          setScale(Math.max(0.05, s));
+          setScale(Math.max(0.05, Math.round(s * 1000) / 1000));
         };
         measure();
         const ro = new ResizeObserver(measure);
@@ -471,11 +471,12 @@
                 width, height,
                 background,
                 position: 'relative',
-                transform: `scale(${scale})`,
+                transform: `scale(${scale}) translateZ(0)`,
                 transformOrigin: 'center',
                 flexShrink: 0,
                 boxShadow: 'none',
                 overflow: 'hidden',
+                backfaceVisibility: 'hidden',
               }}
             >
               <TimelineContext.Provider value={ctxValue}>
@@ -695,6 +696,8 @@
       height: 100%;
       overflow: hidden;
       background: transparent;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
   </style>
 </head>
