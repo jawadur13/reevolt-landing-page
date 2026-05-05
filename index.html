@@ -99,20 +99,13 @@
 
     /* ── HERO ── */
     .hero-section {
-      padding-top: 48px !important;
-      padding-bottom: 48px !important;
-    }
-
-    @media (min-width: 1024px) {
-      .hero-section {
-        min-height: calc(100vh - 60px);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: stretch;
-        padding-top: 24px !important;
-        padding-bottom: 24px !important;
-      }
+      min-height: 55vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+      padding-top: 24px !important;
+      padding-bottom: 24px !important;
     }
 
     .hero {
@@ -375,7 +368,12 @@
     /* ── MAP SECTION ── */
     .map-section {
       background: #f6f4f0;
-      padding: 80px 24px 88px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 24px;
       text-align: center;
       overflow: visible;
       position: relative;
@@ -516,7 +514,12 @@
 
     /* ── FEATURES SECTION ── */
     .features-section {
-      padding: 96px 24px 96px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 24px;
       background: #f6f4f0;
       text-align: center;
     }
@@ -544,7 +547,10 @@
     /* ── INTEGRATIONS SECTION ── */
     .integrations-section {
       background: #f6f4f0;
-      padding: 96px 24px 96px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 48px 24px;
       overflow: hidden;
     }
 
@@ -768,8 +774,13 @@
 
     /* ── PRICING SECTION ── */
     .pricing-section {
-      background: #F8F8F6;
-      padding: 96px 24px;
+      background: #f6f4f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 24px;
       text-align: center;
     }
 
@@ -883,7 +894,12 @@
     /* ── WAITLIST FORM SECTION ── */
     .waitlist-section {
       background: #f6f4f0;
-      padding: 48px 24px 56px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 24px;
     }
 
     .waitlist-inner {
@@ -1440,7 +1456,7 @@
 </section>
 
 <!-- STORE SHOWCASE SECTION -->
-<section class="bg-[#f6f4f0] py-12 lg:py-16 px-6 lg:px-12 overflow-visible">
+<section class="bg-[#f6f4f0] min-h-screen flex flex-col items-center justify-center px-6 lg:px-12 overflow-visible py-12">
   <div class="max-w-2xl mx-auto relative">
 
     <!-- Main Grid Container -->
