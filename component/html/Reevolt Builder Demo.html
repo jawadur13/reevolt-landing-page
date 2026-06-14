@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reevolt Builder — Animated Demo</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=Familjen+Grotesk:wght@400;600&display=swap"
+    rel="stylesheet">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+    integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+    integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+    integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+    crossorigin="anonymous"></script>
+  <script type="text/babel">
+
+    // animations.jsx
+    // Reusable animation starter: Stage, Timeline, Sprite, easing helpers.
+    // Usage (in an HTML file that loads React + Babel):
+    //
+    //   <Stage width={1280} height={720} duration={10} background="#f6f4ef">
+    //     <MyScene />
+    //   </Stage>
+    //
+    // Inside <Stage>, any child can call useTime() to read the current
+    // playhead (seconds). Or wrap content in <Sprite start={1} end={4}>...</Sprite>
+    // to only render during that window -- children receive a `localTime` and
+    // `progress` via the useSprite() hook.
+    //
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    // ── Easing functions (hand-rolled, Popmotion-style) ─────────────────────────
+    // All easings take t ∈ [0,1] and return eased t ∈ [0,1] (may overshoot for back/elastic).
+    const Easing = {
+      linear: (t) => t,
+
+      // Quad
+      easeInQuad: (t) => t * t,
+      easeOutQuad: (t) => t * (2 - t),
+      easeInOutQuad: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
+
+      // Cubic
+      easeInCubic: (t) => t * t * t,
+      easeOutCubic: (t) => (--t) * t * t + 1,
+      easeInOutCubic: (t) => (t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1),
+
+      // Quart
+      easeInQuart: (t) => t * t * t * t,
+      easeOutQuart: (t) => 1 - (--t) * t * t * t,
+      easeInOutQuart: (t) => (t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t),
+
+      // Expo
+      easeInExpo: (t) => (t === 0 ? 0 : Math.pow(2, 10 * (t - 1))),
+      easeOutExpo: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+      easeInOutExpo: (t) => {
+        if (t === 0) return 0;
+        if (t === 1) return 1;
+        if (t < 0.5) return 0.5 * Math.pow(2, 20 * t - 10);
+        return 1 - 0.5 * Math.pow(2, -20 * t + 10);
+      },
+
+      // Sine
+      easeInSine: (t) => 1 - Math.cos((t * Math.PI) / 2),
+      easeOutSine: (t) => Math.sin((t * Math.PI) / 2),
+      easeInOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
+
+      // Back (overshoot)
+      easeOutBack: (t) => {
+        const c1 = 1.70158, c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+      },
+      easeInBack: (t) => {
+        const c1 = 1.70158, c3 = c1 + 1;
+        return c3 * t * t * t - c1 * t * t;
+      },
+      easeInOutBack: (t) => {
+        const c1 = 1.70158, c2 = c1 * 1.525;
+        return t < 0.5
+          ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
+          : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
+      },
+
+      // Elastic
+      easeOutElastic: (t) => {
+        const c4 = (2 * Math.PI) / 3;
+        if (t === 0) return 0;
+        if (t === 1) return 1;
+        return Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+      },
+    };
+
+    // ── Core interpolation helpers ──────────────────────────────────────────────
+
+    // Clamp a value to [min, max]
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+    // interpolate([0, 0.5, 1], [0, 100, 50], ease?) -> fn(t)
+    // Popmotion-style: linearly maps t across input keyframes to output values,
+    // with optional easing per segment (single fn or array of fns).
+    function interpolate(input, output, ease = Easing.linear) {
+      return (t) => {
+        if (t <= input[0]) return output[0];
+        if (t >= input[input.length - 1]) return output[output.length - 1];
+        for (let i = 0; i < input.length - 1; i++) {
+          if (t >= input[i] && t <= input[i + 1]) {
+            const span = input[i + 1] - input[i];
+            const local = span === 0 ? 0 : (t - input[i]) / span;
+            const easeFn = Array.isArray(ease) ? (ease[i] || Easing.linear) : ease;
+            const eased = easeFn(local);
+            return output[i] + (output[i + 1] - output[i]) * eased;
+          }
+        }
+        return output[output.length - 1];
+      };
+    }
+
+    // animate({from, to, start, end, ease})(t) — simpler single-segment tween.
+    // Returns `from` before `start`, `to` after `end`.
+    function animate({ from = 0, to = 1, start = 0, end = 1, ease = Easing.easeInOutCubic }) {
+      return (t) => {
+        if (t <= start) return from;
+        if (t >= end) return to;
+        const local = (t - start) / (end - start);
+        return from + (to - from) * ease(local);
+      };
+    }
+
+    // ── Timeline context ────────────────────────────────────────────────────────
+
+    const TimelineContext = React.createContext({ time: 0, duration: 10, playing: false });
+
+    const useTime = () => React.useContext(TimelineContext).time;
+    const useTimeline = () => React.useContext(TimelineContext);
+
+    // ── Sprite ──────────────────────────────────────────────────────────────────
+    // Renders children only when the playhead is inside [start, end]. Provides
+    // a sub-context with `localTime` (seconds since start) and `progress` (0..1).
+    //
+    //   <Sprite start={2} end={5}>
+    //     {({ localTime, progress }) => <Thing x={progress * 100} />}
+    //   </Sprite>
+    //
+    // Or as a plain wrapper — children can call useSprite() themselves.
+
+    const SpriteContext = React.createContext({ localTime: 0, progress: 0, duration: 0 });
+    const useSprite = () => React.useContext(SpriteContext);
+
+    function Sprite({ start = 0, end = Infinity, children, keepMounted = false }) {
+      const { time } = useTimeline();
+      const visible = time >= start && time <= end;
+      if (!visible && !keepMounted) return null;
+
+      const duration = end - start;
+      const localTime = Math.max(0, time - start);
+      const progress = duration > 0 && isFinite(duration)
+        ? clamp(localTime / duration, 0, 1)
+        : 0;
+
+      const value = { localTime, progress, duration, visible };
+
+      return (
+        <SpriteContext.Provider value={value}>
+          {typeof children === 'function' ? children(value) : children}
+        </SpriteContext.Provider>
+      );
+    }
+
+    // ── Sample sprite components ────────────────────────────────────────────────
+
+    // TextSprite: fades/slides text in on entry, holds, then fades out on exit.
+    // Props: text, x, y, size, color, font, entryDur, exitDur, align
+    function TextSprite({
+      text,
+      x = 0, y = 0,
+      size = 48,
+      color = '#111',
+      font = 'Inter, system-ui, sans-serif',
+      weight = 600,
+      entryDur = 0.45,
+      exitDur = 0.35,
+      entryEase = Easing.easeOutBack,
+      exitEase = Easing.easeInCubic,
+      align = 'left',
+      letterSpacing = '-0.01em',
+    }) {
+      const { localTime, duration } = useSprite();
+      const exitStart = Math.max(0, duration - exitDur);
+
+      let opacity = 1;
+      let ty = 0;
+
+      if (localTime < entryDur) {
+        const t = entryEase(clamp(localTime / entryDur, 0, 1));
+        opacity = t;
+        ty = (1 - t) * 16;
+      } else if (localTime > exitStart) {
+        const t = exitEase(clamp((localTime - exitStart) / exitDur, 0, 1));
+        opacity = 1 - t;
+        ty = -t * 8;
+      }
+
+      const translateX = align === 'center' ? '-50%' : align === 'right' ? '-100%' : '0';
+
+      return (
+        <div style={{
+          position: 'absolute',
+          left: x, top: y,
+          transform: `translate(${translateX}, ${ty}px)`,
+          opacity,
+          fontFamily: font,
+          fontSize: size,
+          fontWeight: weight,
+          color,
+          letterSpacing,
+          whiteSpace: 'pre',
+          lineHeight: 1.1,
+          willChange: 'transform, opacity',
+        }}>
+          {text}
+        </div>
+      );
+    }
+
+    // ImageSprite: scales + fades in; optional Ken Burns drift during hold.
+    function ImageSprite({
+      src,
+      x = 0, y = 0,
+      width = 400, height = 300,
+      entryDur = 0.6,
+      exitDur = 0.4,
+      kenBurns = false,
+      kenBurnsScale = 1.08,
+      radius = 12,
+      fit = 'cover',
+      placeholder = null, // {label: string} for striped placeholder
+    }) {
+      const { localTime, duration } = useSprite();
+      const exitStart = Math.max(0, duration - exitDur);
+
+      let opacity = 1;
+      let scale = 1;
+
+      if (localTime < entryDur) {
+        const t = Easing.easeOutCubic(clamp(localTime / entryDur, 0, 1));
+        opacity = t;
+        scale = 0.96 + 0.04 * t;
+      } else if (localTime > exitStart) {
+        const t = Easing.easeInCubic(clamp((localTime - exitStart) / exitDur, 0, 1));
+        opacity = 1 - t;
+        scale = (kenBurns ? kenBurnsScale : 1) + 0.02 * t;
+      } else if (kenBurns) {
+        const holdSpan = exitStart - entryDur;
+        const holdT = holdSpan > 0 ? (localTime - entryDur) / holdSpan : 0;
+        scale = 1 + (kenBurnsScale - 1) * holdT;
+      }
+
+      const content = placeholder ? (
+        <div style={{
+          width: '100%', height: '100%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'repeating-linear-gradient(135deg, #e9e6df 0 10px, #dcd8cf 10px 20px)',
+          color: '#6b6458',
+          fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+          fontSize: 13,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+        }}>
+          {placeholder.label || 'image'}
+        </div>
+      ) : (
+        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: fit, display: 'block' }} />
+      );
+
+      return (
+        <div style={{
+          position: 'absolute',
+          left: x, top: y,
+          width, height,
+          opacity,
+          transform: `scale(${scale})`,
+          transformOrigin: 'center',
+          borderRadius: radius,
+          overflow: 'hidden',
+          willChange: 'transform, opacity',
+        }}>
+          {content}
+        </div>
+      );
+    }
+
+    // RectSprite: simple rectangle that animates position/size/color via props.
+    // Useful demo primitive — takes a `render` fn for per-frame customization.
+    function RectSprite({
+      x = 0, y = 0,
+      width = 100, height = 100,
+      color = '#111',
+      radius = 8,
+      entryDur = 0.4,
+      exitDur = 0.3,
+      render, // optional: (ctx) => style overrides
+    }) {
+      const spriteCtx = useSprite();
+      const { localTime, duration } = spriteCtx;
+      const exitStart = Math.max(0, duration - exitDur);
+
+      let opacity = 1;
+      let scale = 1;
+
+      if (localTime < entryDur) {
+        const t = Easing.easeOutBack(clamp(localTime / entryDur, 0, 1));
+        opacity = clamp(localTime / entryDur, 0, 1);
+        scale = 0.4 + 0.6 * t;
+      } else if (localTime > exitStart) {
+        const t = Easing.easeInQuad(clamp((localTime - exitStart) / exitDur, 0, 1));
+        opacity = 1 - t;
+        scale = 1 - 0.15 * t;
+      }
+
+      const overrides = render ? render(spriteCtx) : {};
+
+      return (
+        <div style={{
+          position: 'absolute',
+          left: x, top: y,
+          width, height,
+          background: color,
+          borderRadius: radius,
+          opacity,
+          transform: `scale(${scale})`,
+          transformOrigin: 'center',
+          willChange: 'transform, opacity',
+          ...overrides,
+        }} />
+      );
+    }
+
+
+    function Stage({
+      width = 1280,
+      height = 720,
+      duration = 10,
+      background = '#f6f4ef',
+      fps = 60,
+      loop = true,
+      autoplay = true,
+      persistKey = 'animstage',
+      children,
+    }) {
+      const [time, setTime] = React.useState(() => {
+        try {
+          const v = parseFloat(localStorage.getItem(persistKey + ':t') || '0');
+          return isFinite(v) ? clamp(v, 0, duration) : 0;
+        } catch { return 0; }
+      });
+      const [playing, setPlaying] = React.useState(autoplay);
+      const [hoverTime, setHoverTime] = React.useState(null);
+      const [scale, setScale] = React.useState(1);
+
+      const stageRef = React.useRef(null);
+      const canvasRef = React.useRef(null);
+      const rafRef = React.useRef(null);
+      const lastTsRef = React.useRef(null);
+
+      // Persist playhead
+      React.useEffect(() => {
+        try { localStorage.setItem(persistKey + ':t', String(time)); } catch { }
+      }, [time, persistKey]);
+
+      // Auto-scale to fit viewport
+      React.useEffect(() => {
+        if (!stageRef.current) return;
+        const el = stageRef.current;
+        const measure = () => {
+          const barH = 0; // playback bar removed
+          const s = Math.min(
+            el.clientWidth / width,
+            el.clientHeight / height
+          );
+          setScale(Math.max(0.05, Math.round(s * 1000) / 1000));
+        };
+        measure();
+        const ro = new ResizeObserver(measure);
+        ro.observe(el);
+        window.addEventListener('resize', measure);
+        return () => {
+          ro.disconnect();
+          window.removeEventListener('resize', measure);
+        };
+      }, [width, height]);
+
+      // Animation loop
+      React.useEffect(() => {
+        if (!playing) {
+          lastTsRef.current = null;
+          return;
+        }
+        const step = (ts) => {
+          if (lastTsRef.current == null) lastTsRef.current = ts;
+          const dt = (ts - lastTsRef.current) / 1000;
+          lastTsRef.current = ts;
+          setTime((t) => {
+            let next = t + dt;
+            if (next >= duration) {
+              if (loop) next = next % duration;
+              else { next = duration; setPlaying(false); }
+            }
+            return next;
+          });
+          rafRef.current = requestAnimationFrame(step);
+        };
+        rafRef.current = requestAnimationFrame(step);
+        return () => {
+          if (rafRef.current) cancelAnimationFrame(rafRef.current);
+          lastTsRef.current = null;
+        };
+      }, [playing, duration, loop]);
+
+      // Keyboard: space = play/pause, ← → = seek
+      React.useEffect(() => {
+        const onKey = (e) => {
+          if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+          if (e.code === 'Space') {
+            e.preventDefault();
+            setPlaying(p => !p);
+          } else if (e.code === 'ArrowLeft') {
+            setTime(t => clamp(t - (e.shiftKey ? 1 : 0.1), 0, duration));
+          } else if (e.code === 'ArrowRight') {
+            setTime(t => clamp(t + (e.shiftKey ? 1 : 0.1), 0, duration));
+          } else if (e.key === '0' || e.code === 'Home') {
+            setTime(0);
+          }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [duration]);
+
+      const displayTime = hoverTime != null ? hoverTime : time;
+
+      const ctxValue = React.useMemo(
+        () => ({ time: displayTime, duration, playing, setTime, setPlaying }),
+        [displayTime, duration, playing]
+      );
+
+      return (
+        <div
+          ref={stageRef}
+          style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center',
+            background: 'transparent',
+            fontFamily: 'Inter, system-ui, sans-serif',
+          }}
+        >
+          {/* Canvas area — vertically centered in remaining space */}
+          <div style={{
+            flex: 1,
+            width: '100%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
+            minHeight: 0,
+          }}>
+            <div
+              ref={canvasRef}
+              style={{
+                width, height,
+                background,
+                position: 'relative',
+                transform: `scale(${scale}) translateZ(0)`,
+                transformOrigin: 'center',
+                flexShrink: 0,
+                boxShadow: 'none',
+                overflow: 'hidden',
+                backfaceVisibility: 'hidden',
+              }}
+            >
+              <TimelineContext.Provider value={ctxValue}>
+                {children}
+              </TimelineContext.Provider>
+            </div>
+          </div>
+
+        </div>
+      );
+    }
+
+    // ── Playback bar ────────────────────────────────────────────────────────────
+    // Play/pause, return-to-begin, scrub track, time display.
+    // Uses fixed-width time fields so layout doesn't thrash.
+
+    function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, onHover }) {
+      const trackRef = React.useRef(null);
+      const [dragging, setDragging] = React.useState(false);
+
+      const timeFromEvent = React.useCallback((e) => {
+        const rect = trackRef.current.getBoundingClientRect();
+        const x = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+        return x * duration;
+      }, [duration]);
+
+      const onTrackMove = (e) => {
+        if (!trackRef.current) return;
+        const t = timeFromEvent(e);
+        if (dragging) {
+          onSeek(t);
+        } else {
+          onHover(t);
+        }
+      };
+
+      const onTrackLeave = () => {
+        if (!dragging) onHover(null);
+      };
+
+      const onTrackDown = (e) => {
+        setDragging(true);
+        const t = timeFromEvent(e);
+        onSeek(t);
+        onHover(null);
+      };
+
+      React.useEffect(() => {
+        if (!dragging) return;
+        const onUp = () => setDragging(false);
+        const onMove = (e) => {
+          if (!trackRef.current) return;
+          const t = timeFromEvent(e);
+          onSeek(t);
+        };
+        window.addEventListener('mouseup', onUp);
+        window.addEventListener('mousemove', onMove);
+        return () => {
+          window.removeEventListener('mouseup', onUp);
+          window.removeEventListener('mousemove', onMove);
+        };
+      }, [dragging, timeFromEvent, onSeek]);
+
+      const pct = duration > 0 ? (time / duration) * 100 : 0;
+      const fmt = (t) => {
+        const total = Math.max(0, t);
+        const m = Math.floor(total / 60);
+        const s = Math.floor(total % 60);
+        const cs = Math.floor((total * 100) % 100);
+        return `${String(m).padStart(1, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+      };
+
+      const mono = 'JetBrains Mono, ui-monospace, SFMono-Regular, monospace';
+
+      return (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: '8px 16px',
+          background: 'rgba(20,20,20,0.92)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          width: '100%',
+          maxWidth: 680,
+          alignSelf: 'center',
+
+          borderRadius: 8,
+          color: '#f6f4ef',
+          fontFamily: 'Inter, system-ui, sans-serif',
+          userSelect: 'none',
+          flexShrink: 0,
+        }}>
+          <IconButton onClick={onReset} title="Return to start (0)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 2v10M12 2L5 7l7 5V2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+            </svg>
+          </IconButton>
+          <IconButton onClick={onPlayPause} title="Play/pause (space)">
+            {playing ? (
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <rect x="3" y="2" width="3" height="10" fill="currentColor" />
+                <rect x="8" y="2" width="3" height="10" fill="currentColor" />
+              </svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M3 2l9 5-9 5V2z" fill="currentColor" />
+              </svg>
+            )}
+          </IconButton>
+
+          {/* Current time: fixed width so it doesn't thrash */}
+          <div style={{
+            fontFamily: mono,
+            fontSize: 12,
+            fontVariantNumeric: 'tabular-nums',
+            width: 64, textAlign: 'right',
+            color: '#f6f4ef',
+          }}>
+            {fmt(time)}
+          </div>
+
+          {/* Scrub track */}
+          <div
+            ref={trackRef}
+            onMouseMove={onTrackMove}
+            onMouseLeave={onTrackLeave}
+            onMouseDown={onTrackDown}
+            style={{
+              flex: 1,
+              height: 22,
+              position: 'relative',
+              cursor: 'pointer',
+              display: 'flex', alignItems: 'center',
+            }}
+          >
+            <div style={{
+              position: 'absolute',
+              left: 0, right: 0, height: 4,
+              background: 'rgba(255,255,255,0.12)',
+              borderRadius: 2,
+            }} />
+            <div style={{
+              position: 'absolute',
+              left: 0, width: `${pct}%`, height: 4,
+              background: 'oklch(72% 0.12 250)',
+              borderRadius: 2,
+            }} />
+            <div style={{
+              position: 'absolute',
+              left: `${pct}%`, top: '50%',
+              width: 12, height: 12,
+              marginLeft: -6, marginTop: -6,
+              background: '#fff',
+              borderRadius: 6,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.4)',
+            }} />
+          </div>
+
+          {/* Duration: fixed width */}
+          <div style={{
+            fontFamily: mono,
+            fontSize: 12,
+            fontVariantNumeric: 'tabular-nums',
+            width: 64, textAlign: 'left',
+            color: 'rgba(246,244,239,0.55)',
+          }}>
+            {fmt(duration)}
+          </div>
+        </div>
+      );
+    }
+
+    function IconButton({ children, onClick, title }) {
+      const [hover, setHover] = React.useState(false);
+      return (
+        <button
+          onClick={onClick}
+          title={title}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          style={{
+            width: 28, height: 28,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: hover ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 6,
+            color: '#f6f4ef',
+            cursor: 'pointer',
+            padding: 0,
+            transition: 'background 120ms',
+          }}
+        >
+          {children}
+        </button>
+      );
+    }
+
+
+    Object.assign(window, {
+      Easing, interpolate, animate, clamp,
+      TimelineContext, useTime, useTimeline,
+      Sprite, SpriteContext, useSprite,
+      TextSprite, ImageSprite, RectSprite,
+      Stage, PlaybackBar,
+    });
+
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body,
+    #root {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+    // ── Design tokens ──────────────────────────────────────────────────────────
+    const BLUE = '#1A35FF';
+    const CREAM = '#F5F0E8';
+    const GREEN = '#16a34a';
+    const BORDER = 'rgba(0,0,0,0.1)';
+    const FJG = "'Familjen Grotesk', sans-serif";
+    const PJS = "'Plus Jakarta Sans', sans-serif";
+
+    // ── Piecewise interpolator along [time,value] waypoints ───────────────────
+    function pathLerp(pts, t, ease) {
+      ease = ease || Easing.easeInOutCubic;
+      if (t <= pts[0][0]) return pts[0][1];
+      if (t >= pts[pts.length - 1][0]) return pts[pts.length - 1][1];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const [t0, v0] = pts[i];
+        const [t1, v1] = pts[i + 1];
+        if (t >= t0 && t <= t1) {
+          const p = ease((t - t0) / (t1 - t0));
+          return v0 + (v1 - v0) * p;
+        }
+      }
+      return pts[pts.length - 1][1];
+    }
+
+    // ── Shared icons ───────────────────────────────────────────────────────────
+    const DotGrid = () => (
+      <svg width="10" height="14" viewBox="0 0 10 14" fill="rgba(0,0,0,0.28)">
+        <circle cx="3" cy="3" r="1.2" /><circle cx="7" cy="3" r="1.2" />
+        <circle cx="3" cy="7" r="1.2" /><circle cx="7" cy="7" r="1.2" />
+        <circle cx="3" cy="11" r="1.2" /><circle cx="7" cy="11" r="1.2" />
+      </svg>
+    );
+
+    const HeroIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={BLUE} strokeWidth="1.5">
+        <rect x="1" y="3" width="14" height="10" rx="1.5" />
+        <line x1="4" y1="6" x2="10" y2="6" />
+        <line x1="4" y1="8.5" x2="8" y2="8.5" />
+      </svg>
+    );
+    const ProductsIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={BLUE} strokeWidth="1.5">
+        <rect x="1" y="1" width="6" height="6" rx="1" />
+        <rect x="9" y="1" width="6" height="6" rx="1" />
+        <rect x="1" y="9" width="6" height="6" rx="1" />
+        <rect x="9" y="9" width="6" height="6" rx="1" />
+      </svg>
+    );
+    const TextIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={BLUE} strokeWidth="1.5">
+        <rect x="1" y="4" width="14" height="9" rx="1.5" />
+        <line x1="4" y1="7" x2="12" y2="7" />
+        <line x1="4" y1="9.5" x2="9" y2="9.5" />
+      </svg>
+    );
+    const BtnIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={BLUE} strokeWidth="1.5">
+        <rect x="2" y="5" width="12" height="7" rx="1.5" />
+        <line x1="5" y1="8.5" x2="11" y2="8.5" />
+      </svg>
+    );
+
+    // ── Sidebar block ──────────────────────────────────────────────────────────
+    function SidebarBlock({ name, desc, icon, lifted }) {
+      return (
+        <div style={{
+          background: '#fff',
+          border: `0.5px solid ${lifted ? BLUE : BORDER}`,
+          borderRadius: 8,
+          padding: '10px 12px',
+          display: 'flex', alignItems: 'center', gap: 10,
+          transform: lifted ? 'scale(1.04)' : 'scale(1)',
+          boxShadow: lifted
+            ? '0 10px 28px rgba(26,53,255,0.22)'
+            : '0 1px 2px rgba(0,0,0,0.04)',
+          transition: 'transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease',
+          userSelect: 'none',
+        }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 6,
+            background: '#EEF1FF',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>{icon}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: PJS, fontSize: 12, fontWeight: 500, color: '#111' }}>{name}</div>
+            <div style={{ fontFamily: PJS, fontSize: 10.5, color: 'rgba(0,0,0,0.4)', marginTop: 1 }}>{desc}</div>
+          </div>
+          <DotGrid />
+        </div>
+      );
+    }
+
+    // ── Drop zone ──────────────────────────────────────────────────────────────
+    function DropZone({ hot }) {
+      return (
+        <div style={{
+          border: `2px dashed ${hot ? BLUE : 'rgba(0,0,0,0.18)'}`,
+          borderRadius: 10,
+          minHeight: 90,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          color: hot ? BLUE : 'rgba(0,0,0,0.3)',
+          fontFamily: PJS, fontSize: 12,
+          background: hot ? 'rgba(26,53,255,0.055)' : 'transparent',
+          transition: 'all 0.2s ease',
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Drag components here
+        </div>
+      );
+    }
+
+    // ── Canvas: hero section ───────────────────────────────────────────────────
+    function CanvasHero({ entry }) {
+      const p = clamp(entry, 0, 1);
+      const sc = 0.95 + 0.05 * Easing.easeOutBack(p);
+      const op = Math.min(p * 4, 1);
+      return (
+        <div style={{
+          background: BLUE, borderRadius: 12,
+          padding: '20px 22px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+          transform: `scale(${sc})`, opacity: op,
+          transformOrigin: 'top center',
+        }}>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontFamily: FJG, fontSize: 10, fontWeight: 600,
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.6)', marginBottom: 6,
+            }}>New collection</div>
+            <div style={{
+              fontFamily: FJG, fontSize: 17, fontWeight: 600,
+              color: '#fff', lineHeight: 1.2, marginBottom: 7,
+            }}>Everything you need<br />to sell online</div>
+            <div style={{
+              fontFamily: PJS, fontSize: 11.5,
+              color: 'rgba(255,255,255,0.7)', marginBottom: 12, lineHeight: 1.5,
+            }}>Reach more customers. Accept payments. Grow your store.</div>
+            <div style={{
+              display: 'inline-block', background: '#fff', color: BLUE,
+              fontFamily: FJG, fontSize: 11, fontWeight: 600,
+              padding: '6px 14px', borderRadius: 6,
+            }}>Shop now →</div>
+          </div>
+          <div style={{
+            width: 80, height: 80, borderRadius: 10,
+            background: 'rgba(255,255,255,0.12)',
+            flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.38)" strokeWidth="1.2">
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+              <circle cx="12" cy="10" r="4" />
+              <path d="M5 21c0-4 3.1-7 7-7s7 3 7 7" />
+            </svg>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Canvas: products grid ──────────────────────────────────────────────────
+    const PROD_DATA = [
+      { name: 'Handmade bag', price: '৳1,200', bg: '#FDE8D8', sc: '#C2622A' },
+      { name: 'Cotton shirt', price: '৳850', bg: '#D8EDE0', sc: '#2A7A4B' },
+      { name: 'Leather wallet', price: '৳2,400', bg: '#E8E0D8', sc: '#7A5C2A' },
+    ];
+
+    function CanvasProducts({ entry }) {
+      const p = clamp(entry, 0, 1);
+      const sc = 0.95 + 0.05 * Easing.easeOutBack(p);
+      const op = Math.min(p * 4, 1);
+      return (
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8,
+          transform: `scale(${sc})`, opacity: op,
+          transformOrigin: 'top center',
+        }}>
+          {PROD_DATA.map((p2, i) => (
+            <div key={i} style={{
+              background: '#fff', border: `0.5px solid ${BORDER}`,
+              borderRadius: 8, overflow: 'hidden',
+            }}>
+              <div style={{
+                height: 58, background: p2.bg,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={p2.sc} strokeWidth="1.2">
+                  <rect x="3" y="3" width="18" height="18" rx="3" />
+                  <circle cx="12" cy="10" r="4" />
+                  <path d="M5 21c0-4 3.1-7 7-7s7 3 7 7" />
+                </svg>
+              </div>
+              <div style={{ padding: '8px 10px' }}>
+                <div style={{ fontFamily: PJS, fontSize: 11, fontWeight: 500, color: '#111', marginBottom: 2 }}>{p2.name}</div>
+                <div style={{ fontFamily: FJG, fontSize: 11, fontWeight: 600, color: BLUE }}>{p2.price}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // ── Builder view ───────────────────────────────────────────────────────────
+    // Layout at inset:0 (1280×720):
+    //   Topbar: h=48, y=0–48
+    //   Sidebar: w=190, x=0–190; body y=48–720
+    //   Canvas: x=190–1280; padding=16
+    //   Canvas inner starts: x=206, y=64
+    //   Sidebar items: y=62 (48+14), label h≈12, mb=4 → blocks start y≈78
+    //   HeroBanner: y=78, h≈52, center≈104
+    //   Products: y=78+52+8=138, center≈164
+    function BuilderView({ t }) {
+      const heroDragging = t >= 1.0 && t < 1.5;
+      const heroVisible = t >= 1.5;
+      const heroEntry = clamp((t - 1.5) / 0.25, 0, 1);
+
+      const dz2Visible = t >= 1.7 && t < 2.9;
+      const prodDragging = t >= 2.4 && t < 2.9;
+      const prodsVisible = t >= 2.9;
+      const prodsEntry = clamp((t - 2.9) / 0.25, 0, 1);
+
+      const dz1Hot = t >= 1.3 && t < 1.5;
+      const dz2Hot = t >= 2.65 && t < 2.9;
+
+      const published = t >= 3.9;
+      const pulsing = t >= 3.7 && t < 3.9;
+      const pubScale = pulsing ? 1 + 0.055 * Math.sin(((t - 3.7) / 0.2) * Math.PI) : 1;
+
+      return (
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', flexDirection: 'column',
+          background: '#fff', fontFamily: PJS,
+        }}>
+          {/* ── Topbar ── */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0 16px', height: 48,
+            borderBottom: `0.5px solid ${BORDER}`,
+            flexShrink: 0, background: '#fff',
+          }}>
+            <span style={{ fontFamily: FJG, fontSize: 15, fontWeight: 600, color: BLUE }}>Reevolt</span>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <span style={{
+                fontSize: 12, fontWeight: 500, color: 'rgba(0,0,0,0.48)',
+                border: `0.5px solid ${BORDER}`, borderRadius: 6, padding: '5px 12px',
+              }}>Preview</span>
+              <span style={{
+                fontFamily: FJG, fontSize: 12, fontWeight: 600, color: '#fff',
+                background: published ? GREEN : BLUE,
+                borderRadius: 6, padding: '5px 16px',
+                display: 'inline-block',
+                transform: `scale(${pubScale})`,
+                transformOrigin: 'center',
+                transition: 'background 0.35s ease',
+                boxShadow: published ? '0 0 0 3px rgba(22,163,74,0.18)' : 'none',
+              }}>{published ? 'Published ✓' : 'Publish'}</span>
+            </div>
+          </div>
+
+          {/* ── Body ── */}
+          <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+            {/* Sidebar */}
+            <div style={{
+              width: 190, flexShrink: 0,
+              borderRight: `0.5px solid ${BORDER}`,
+              background: '#FAFAF8',
+              padding: '14px 12px',
+              display: 'flex', flexDirection: 'column', gap: 8,
+            }}>
+              <div style={{
+                fontFamily: PJS, fontSize: 10, fontWeight: 600,
+                letterSpacing: '0.08em', textTransform: 'uppercase',
+                color: 'rgba(0,0,0,0.38)', marginBottom: 4,
+              }}>Components</div>
+              <SidebarBlock name="Hero banner" desc="Header + CTA" icon={<HeroIcon />} lifted={heroDragging} />
+              <SidebarBlock name="Products" desc="Product grid" icon={<ProductsIcon />} lifted={prodDragging} />
+              <SidebarBlock name="Text block" desc="Paragraph" icon={<TextIcon />} />
+              <SidebarBlock name="Button" desc="CTA button" icon={<BtnIcon />} />
+            </div>
+
+            {/* Canvas */}
+            <div style={{
+              flex: 1, background: CREAM,
+              padding: 16, overflow: 'hidden',
+              display: 'flex', flexDirection: 'column', gap: 10,
+            }}>
+              {!heroVisible && <DropZone hot={dz1Hot} />}
+              {heroVisible && <CanvasHero entry={heroEntry} />}
+              {dz2Visible && <DropZone hot={dz2Hot} />}
+              {prodsVisible && <CanvasProducts entry={prodsEntry} />}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Live published site ────────────────────────────────────────────────────
+    function LiveSite() {
+      return (
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: CREAM,
+          display: 'flex', flexDirection: 'column',
+          fontFamily: PJS, overflow: 'hidden',
+        }}>
+          {/* Nav */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0 52px', height: 58,
+            background: '#fff', borderBottom: `0.5px solid ${BORDER}`,
+            flexShrink: 0,
+          }}>
+            <span style={{ fontFamily: FJG, fontSize: 17, fontWeight: 600, color: BLUE }}>Shajahan Store</span>
+            <div style={{ display: 'flex', gap: 30 }}>
+              {['Home', 'Products', 'About', 'Contact'].map(l => (
+                <span key={l} style={{ fontSize: 13, color: 'rgba(0,0,0,0.5)', cursor: 'pointer' }}>{l}</span>
+              ))}
+            </div>
+            <div style={{
+              width: 36, height: 36, borderRadius: 8,
+              border: `0.5px solid ${BORDER}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.45)" strokeWidth="1.5">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Page body */}
+          <div style={{
+            flex: 1, padding: '28px 52px',
+            display: 'flex', flexDirection: 'column', gap: 24, overflow: 'hidden',
+          }}>
+            {/* Hero */}
+            <div style={{
+              background: BLUE, borderRadius: 18,
+              padding: '38px 44px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 28,
+              flexShrink: 0,
+            }}>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontFamily: FJG, fontSize: 11, fontWeight: 600,
+                  letterSpacing: '0.12em', textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.55)', marginBottom: 10,
+                }}>New collection · 2025</div>
+                <div style={{
+                  fontFamily: FJG, fontSize: 32, fontWeight: 600,
+                  color: '#fff', lineHeight: 1.15, marginBottom: 12,
+                }}>Everything you need<br />to sell online</div>
+                <div style={{
+                  fontSize: 14, color: 'rgba(255,255,255,0.72)',
+                  marginBottom: 24, lineHeight: 1.7, maxWidth: 300,
+                }}>Reach more customers, accept payments seamlessly, and grow your store with confidence.</div>
+                <div style={{
+                  display: 'inline-block', background: '#fff', color: BLUE,
+                  fontFamily: FJG, fontSize: 13, fontWeight: 600,
+                  padding: '11px 26px', borderRadius: 9, cursor: 'pointer',
+                }}>Shop now →</div>
+              </div>
+              <div style={{
+                width: 170, height: 170, borderRadius: 18,
+                background: 'rgba(255,255,255,0.13)',
+                flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="0.9">
+                  <rect x="3" y="3" width="18" height="18" rx="3" />
+                  <circle cx="12" cy="10" r="4" />
+                  <path d="M5 21c0-4 3.1-7 7-7s7 3 7 7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Products */}
+            <div style={{ flexShrink: 0 }}>
+              <div style={{
+                fontFamily: FJG, fontSize: 15, fontWeight: 600,
+                color: '#111', marginBottom: 14,
+              }}>Featured products</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
+                {PROD_DATA.map((p, i) => (
+                  <div key={i} style={{
+                    background: '#fff', border: `0.5px solid ${BORDER}`,
+                    borderRadius: 12, overflow: 'hidden', cursor: 'pointer',
+                  }}>
+                    <div style={{
+                      height: 108, background: p.bg,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={p.sc} strokeWidth="0.9">
+                        <rect x="3" y="3" width="18" height="18" rx="3" />
+                        <circle cx="12" cy="10" r="4" />
+                        <path d="M5 21c0-4 3.1-7 7-7s7 3 7 7" />
+                      </svg>
+                    </div>
+                    <div style={{ padding: '13px 15px' }}>
+                      <div style={{ fontFamily: PJS, fontSize: 13, fontWeight: 500, color: '#111', marginBottom: 4 }}>{p.name}</div>
+                      <div style={{ fontFamily: FJG, fontSize: 13, fontWeight: 600, color: BLUE }}>{p.price}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Drag ghost ─────────────────────────────────────────────────────────────
+    function Ghost({ type, x, y }) {
+      const cfg = type === 'hero'
+        ? { label: 'Hero banner', Icon: HeroIcon, w: 158 }
+        : { label: 'Products', Icon: ProductsIcon, w: 148 };
+      return (
+        <div style={{
+          position: 'absolute',
+          left: x - cfg.w / 2, top: y - 21,
+          width: cfg.w, height: 42,
+          pointerEvents: 'none', zIndex: 999,
+          background: '#fff',
+          border: `0.5px solid ${BORDER}`,
+          borderRadius: 8,
+          boxShadow: '0 12px 32px rgba(0,0,0,0.18)',
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '0 12px',
+          opacity: 0.94,
+          transform: 'rotate(-1.5deg)',
+        }}>
+          <div style={{
+            width: 24, height: 24, borderRadius: 5, background: '#EEF1FF',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          }}>
+            <cfg.Icon />
+          </div>
+          <span style={{ fontFamily: PJS, fontSize: 11, fontWeight: 500, color: '#111' }}>{cfg.label}</span>
+        </div>
+      );
+    }
+
+    // ── Cursor ─────────────────────────────────────────────────────────────────
+    function AnimCursor({ x, y, pressing, visible }) {
+      if (!visible) return null;
+      return (
+        <div style={{
+          position: 'absolute', left: x, top: y,
+          pointerEvents: 'none', zIndex: 1000,
+          transform: 'translate(-3px, -2px)',
+          filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.4))',
+        }}>
+          <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
+            <path
+              d="M3.5 1.5 L3.5 19.5 L7.2 15.2 L10.2 21.5 L12.5 20.8 L9.5 14.5 L15 14.5 Z"
+              fill="white" stroke="#111" strokeWidth="1.2" strokeLinejoin="round"
+            />
+          </svg>
+          {pressing && (
+            <div style={{
+              position: 'absolute', left: -10, top: -10,
+              width: 20, height: 20, borderRadius: 10,
+              background: BLUE, opacity: 0.22,
+            }} />
+          )}
+        </div>
+      );
+    }
+
+    // ── Main scene ─────────────────────────────────────────────────────────────
+    // Timeline (8s loop):
+    //  0.0–0.3   builder fades in (empty)
+    //  0.4       cursor appears, begins move to hero block
+    //  0.4–0.9   cursor → hero banner (x=95, y=104)
+    //  0.9       arrive at hero block
+    //  0.9–1.0   press down
+    //  1.0–1.5   drag to drop zone 1 (x=735, y=114); zone hot at 1.3
+    //  1.5       release, hero snaps in
+    //  1.7       drop zone 2 appears
+    //  1.7–2.3   cursor → products block (x=95, y=164)
+    //  2.3–2.4   press down
+    //  2.4–2.9   drag to drop zone 2 (x=735, y=250); zone hot at 2.65
+    //  2.9       release, products snap in
+    //  3.0–3.7   cursor → publish button (x=1210, y=24)
+    //  3.7–3.9   button pulses
+    //  3.9       click → Published
+    //  4.2–4.6   builder fades out
+    //  4.6–5.0   live site fades in
+    //  5.0–6.5   hold on live site (1.5s)
+    //  6.5–6.8   live site fades out
+    //  6.8–7.2   brief pause
+    //  7.2–7.6   builder fades back in (loop)
+
+    function Scene() {
+      const t = useTime();
+      const rootRef = React.useRef(null);
+
+      React.useEffect(() => {
+        if (rootRef.current) {
+          rootRef.current.setAttribute('data-screen-label', `t=${Math.floor(t)}s`);
+        }
+      });
+
+      // Builder opacity
+      const builderOp = (() => {
+        if (t < 0.3) return t / 0.3;
+        if (t <= 4.2) return 1;
+        if (t <= 4.6) return 1 - (t - 4.2) / 0.4;
+        if (t <= 7.2) return 0;
+        if (t <= 7.6) return (t - 7.2) / 0.4;
+        return 1;
+      })();
+
+      // Live site opacity
+      const liveOp = (() => {
+        if (t < 4.6) return 0;
+        if (t <= 5.0) return (t - 4.6) / 0.4;
+        if (t <= 6.5) return 1;
+        if (t <= 6.8) return 1 - (t - 6.5) / 0.3;
+        return 0;
+      })();
+
+      // Cursor X path
+      const cxPts = [
+        [0.4, 640],
+        [0.9, 95],  // hero block
+        [1.0, 95],  // hold / click
+        [1.5, 735],  // drop zone 1
+        [1.8, 735],  // hold after drop
+        [2.3, 95],  // products block
+        [2.4, 95],  // hold / click
+        [2.9, 735],  // drop zone 2
+        [3.1, 735],  // hold after drop
+        [3.7, 1210],  // publish button
+        [4.6, 1210],
+      ];
+      // Cursor Y path
+      const cyPts = [
+        [0.4, 360],
+        [0.9, 104],  // hero block center y
+        [1.0, 104],
+        [1.5, 114],  // drop zone 1 center y
+        [1.8, 114],
+        [2.3, 164],  // products block center y
+        [2.4, 164],
+        [2.9, 252],  // drop zone 2 center y (below hero ~120px)
+        [3.1, 252],
+        [3.7, 24],  // topbar center y (publish button)
+        [4.6, 24],
+      ];
+
+      const cx = pathLerp(cxPts, t);
+      const cy = pathLerp(cyPts, t);
+
+      const cursorVisible = t >= 0.4 && t < 4.6;
+      const pressing = (t >= 0.85 && t < 1.0) || (t >= 2.25 && t < 2.4) || (t >= 3.65 && t < 3.95);
+      const heroDragging = t >= 1.0 && t < 1.5;
+      const prodDragging = t >= 2.4 && t < 2.9;
+
+      return (
+        <div ref={rootRef} data-screen-label="t=0s" style={{ position: 'absolute', inset: 0 }}>
+          {/* Builder layer */}
+          <div style={{ position: 'absolute', inset: 0, opacity: builderOp }}>
+            <BuilderView t={t} />
+          </div>
+          {/* Live site layer (above builder during crossfade) */}
+          <div style={{ position: 'absolute', inset: 0, opacity: liveOp, pointerEvents: 'none' }}>
+            <LiveSite />
+          </div>
+          {/* Drag ghosts */}
+          {heroDragging && <Ghost type="hero" x={cx} y={cy} />}
+          {prodDragging && <Ghost type="products" x={cx} y={cy} />}
+          {/* Cursor (always on top) */}
+          <AnimCursor x={cx} y={cy} pressing={pressing} visible={cursorVisible} />
+        </div>
+      );
+    }
+
+    // ── Root ───────────────────────────────────────────────────────────────────
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      <Stage
+        width={1280} height={720} duration={8}
+        background={CREAM} loop={true} autoplay={true}
+        persistKey="reevolt-builder-demo"
+      >
+        <Scene />
+      </Stage>
+    );
+
+  </script>
+</body>
+
+</html>

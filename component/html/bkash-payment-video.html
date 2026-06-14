@@ -63,9 +63,11 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(1);
+      transform: translate(-50%, -50%) scale(1) translateZ(0);
       transform-origin: center center;
       margin: 0;
+      backface-visibility: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
     .card-header {
@@ -850,9 +852,9 @@
         // Using 440 and 600 as the "safe" bounds for the card dimensions
         const scaleX = viewportWidth / 440;
         const scaleY = viewportHeight / 600;
-        const scale = Math.min(scaleX, scaleY) * 0.98; // 0.98 for a tiny safety gap
+        const scale = Math.round(Math.min(scaleX, scaleY) * 0.98 * 1000) / 1000; // Round to 3 decimal places
         
-        card.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        card.style.transform = `translate(-50%, -50%) scale(${scale}) translateZ(0)`;
       }
       window.addEventListener('resize', autoScale);
       autoScale();
